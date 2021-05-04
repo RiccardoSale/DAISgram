@@ -15,31 +15,41 @@
 
 using namespace std;
 
-class Tensor
-{
+//IMPLEMENTARE INSERIMENTO ALL INTERO DELL ARRAY
+
+
+
+
+class Tensor{
 private:
-
     float * data;
-
-    int c;
-    int r; 
-    int d;
-
+    int x,y,z;
 public:
+    //stampa provvisoria
+    void stampa(){
+        for(int zz=0;zz<z;zz++){
+            for(int yy=0;yy<y;yy++){
+                for(int xx=0;xx<x;xx++){
+                    std::cout<<data[zz*x*y+(yy*x+xx)]<<"||";
+                }
+                std::cout<<"\n";
+            }
+            std::cout<<"\n"<<"nuova dim"<<"\n";
+        }
+    }
+
 
     /**
      * Class constructor
      * 
      * Parameter-less class constructor 
      */
-    Tensor()
-    {
+    Tensor(){
         data = nullptr;
-        this->c = 0;
-        this->r = 0;
-        this->d = 0;
+        this->x = 0;
+        this->y = 0;
+        this->z = 0;
     }
-
     /**
      * Class constructor
      * 
@@ -51,14 +61,27 @@ public:
      * @param v
      * @return new Tensor
      */
-    Tensor(int r, int c, int d, float v = 0.0);
-
+    Tensor(int r, int c, int d, float v = 0.0){
+        x=r;
+        y=c;
+        z=d;
+        data=new float[x*y*z];
+        for(int zz=0;zz<z;zz++){
+            for(int yy=0;yy<y;yy++){
+                for(int xx=0;xx<x;xx++){
+                    data[zz*x*y+(yy*x+xx)]=0.0;
+                }
+            }
+        }
+    };
     /**
      * Class distructor
      * 
      * Cleanup the data when deallocated
      */
-    ~Tensor();
+    ~Tensor(){
+        delete data;
+    };
 
     /**
      * Operator oveloding ()
@@ -67,7 +90,10 @@ public:
      * 
      * @return the value at location [i][j][k]
      */
-    float operator()(int i, int j, int k) const;
+    float operator()(int i, int j, int k) const{
+        return data[k*x*y+(j*x+i)];
+        //TODO EXCEPTION
+    };
 
     /**
      * Operator oveloding ()
@@ -79,7 +105,11 @@ public:
      * 
      * @return the pointer to the location [i][j][k]
      */
-    float &operator()(int i, int j, int k);
+    float &operator()(int i, int j, int k){
+        float& res=data[k*x*y+(j*x+i)];
+        return res;
+        //TODO EXCEPTION
+    };
 
     /**
      * Copy constructor
@@ -204,6 +234,7 @@ public:
      * @param std  Standard deviation
      */
     void init_random(float mean=1.0, float std=0.0){
+        /*
         if(data){
             float y1;
             float y2;
@@ -221,7 +252,7 @@ public:
 
         }else{
             throw(tensor_not_initialized());
-        }
+        }*/
     }
 
     /**
