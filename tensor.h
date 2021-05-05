@@ -119,7 +119,18 @@ public:
      * @return the new Tensor
      */
     Tensor(const Tensor& that){
-
+    	x=that.x;
+        y=that.y;
+        z=that.z;
+        data=new float[x*y*z];
+        
+        for(int zz=0; zz<z; zz++){    
+            for(int yy=0; yy<y; yy++){
+                for(int i=0; i<x; i++){
+                    data(i, yy, zz) = that(i, yy, zz);
+                }
+            }
+        }
     };
 
     /**
@@ -357,7 +368,17 @@ public:
      * @param low Lower value
      * @param high Higher value 
      */
-    void clamp(float low, float high);
+    void clamp(float low, float high){
+    	for(int zz=0; zz<z; zz++)
+            for(int yy=0; yy<y; yy++)
+                for(int xx=0; xx<x; xx++){
+                    float elem = data(xx, yy, zz);
+                    if(elem < low)
+                        data(xx, yy, zz) = low;
+                    else if(elem > high)
+                        data(xx, yy, zz) = high;
+                }
+    };
 
     /**
      * Tensor Rescaling
@@ -404,7 +425,23 @@ public:
      * @param pad_w the width padding
      * @return the padded tensor
      */
-    Tensor padding(int pad_h, int pad_w);
+    Tensor padding(int pad_h, int pad_w){
+        Tensor res(x+2*pad_h, y+2*pad_w, z);
+        int i=0;
+        float new_x = x+2*pad_h;
+        float new_y = x+2*pad_w;
+        for(int zz=0; zz<z; zz++){
+            for(int yy=0; yy<new_y; yy++){
+                for(int xx=0; xx<new_x; xx++){
+                    if(xx < pad_h || xx > x+pad_h || yy < pad_w || yy > y+pad_w){   //da controllare !!
+                        res.data(xx, yy, zz) = 0.0;
+                    }else{
+                        res.data(xx, yy, zz) = data[i++];
+                    }
+                }
+            }
+        }
+    };
 
     /**
      * Subset a tensor
