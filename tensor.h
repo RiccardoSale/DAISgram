@@ -15,27 +15,23 @@
 
 using namespace std;
 
-//IMPLEMENTARE INSERIMENTO ALL INTERO DELL ARRAY
-
-
 class Tensor{
 private:
     float * data;
-    int x,y,z;
+    int r,c,d;
 public:
     //stampa provvisoria
     void stampa(){
-        for(int zz=0;zz<z;zz++){
-            for(int yy=0;yy<y;yy++){
-                for(int xx=0;xx<x;xx++){
-                    std::cout<<data[zz*x*y+(yy*x+xx)]<<"||";
+        for(int zz=0;zz<d;zz++){
+            for(int yy=0;yy<c;yy++){
+                for(int xx=0;xx<r;xx++){
+                    std::cout<<data[zz*r*c+(yy*r+xx)]<<"||";
                 }
                 std::cout<<"\n";
             }
             std::cout<<"\n"<<"nuova dim"<<"\n";
         }
     }
-
 
     /**
      * Class constructor
@@ -44,9 +40,9 @@ public:
      */
     Tensor(){
         data = nullptr;
-        this->x = 0;
-        this->y = 0;
-        this->z = 0;
+        this->r = 0;
+        this->c = 0;
+        this->d = 0;
     }
     /**
      * Class constructor
@@ -60,16 +56,13 @@ public:
      * @return new Tensor
      */
     Tensor(int r, int c, int d, float v = 0.0){
-        x=r;
-        y=c;
-        z=d;
-        data=new float[x*y*z];
-        for(int zz=0;zz<z;zz++){
-            for(int yy=0;yy<y;yy++){
-                for(int xx=0;xx<x;xx++){
-                    data[zz*x*y+(yy*x+xx)]=0.0;
-                }
-            }
+        this->r=r;
+        this->c=c;
+        this->d=d;
+        int i_max{r*c*d};
+        data=new float[i_max];
+        for(int i=0;i<i_max;i++){
+            data[i]=0.0;
         }
     };
     /**
@@ -89,7 +82,7 @@ public:
      * @return the value at location [i][j][k]
      */
     float operator()(int i, int j, int k) const{
-        return data[k*x*y+(j*x+i)];
+        return data[k*r*c+(j*r+i)];
         //TODO EXCEPTION
     };
 
@@ -104,12 +97,12 @@ public:
      * @return the pointer to the location [i][j][k]
      */
     float &operator()(int i, int j, int k){
-        float& res=data[k*x*y+(j*x+i)];
+        float& res=data[k*r*c+(j*r+i)];
         return res;
         //TODO EXCEPTION
     };
     int at(int i,int j,int k){
-        return k*x*y+(j*x+i);
+        return k*r*c+(j*r+i);
     };
     /**
      * Copy constructor
@@ -119,17 +112,13 @@ public:
      * @return the new Tensor
      */
     Tensor(const Tensor& that){
-    	x=that.x;
-        y=that.y;
-        z=that.z;
-        data=new float[x*y*z];
-        
-        for(int zz=0; zz<z; zz++){    
-            for(int yy=0; yy<y; yy++){
-                for(int i=0; i<x; i++){
-                    data(i, yy, zz) = that(i, yy, zz);
-                }
-            }
+    	r=that.r;
+        c=that.c;
+        d=that.d;
+        int i_max{r*c*d};
+        data=new float[i_max];
+        for(int i=0;i<i_max;i++) {
+            data[i] = that.data[i];
         }
     };
 
@@ -144,13 +133,10 @@ public:
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
     friend Tensor operator-(Tensor lhs, const Tensor &rhs){
-        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
-        for(int zz=0;zz<lhs.z;zz++){
-            for(int yy=0;yy<lhs.y;yy++){
-                for(int xx=0;xx<lhs.x;xx++){
-                    res(xx,yy,zz)=lhs(xx,yy,zz)-rhs(xx,yy,zz);
-                }
-            }
+        Tensor res(lhs.r,lhs.c,lhs.d);
+        int i_max=lhs.r*lhs.c*lhs.d;
+        for(int i=0;i<i_max;i++) {
+            res.data[i]=lhs.data[i]-rhs.data[i];
         }
         return res;
     };
@@ -166,13 +152,10 @@ public:
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
     friend Tensor operator+(Tensor lhs, const Tensor &rhs){
-        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
-        for(int zz=0;zz<lhs.z;zz++){
-            for(int yy=0;yy<lhs.y;yy++){
-                for(int xx=0;xx<lhs.x;xx++){
-                    res(xx,yy,zz)=lhs(xx,yy,zz)+rhs(xx,yy,zz);
-                }
-            }
+        Tensor res(lhs.r,lhs.c,lhs.d);
+        int i_max=lhs.r*lhs.c*lhs.d;
+        for(int i=0;i<i_max;i++) {
+            res.data[i]=lhs.data[i]+rhs.data[i];
         }
         return res;
     };
@@ -188,13 +171,10 @@ public:
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
     friend Tensor operator*(Tensor lhs, const Tensor &rhs){
-        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
-        for(int zz=0;zz<lhs.z;zz++){
-            for(int yy=0;yy<lhs.y;yy++){
-                for(int xx=0;xx<lhs.x;xx++){
-                    res(xx,yy,zz)=lhs(xx,yy,zz)*rhs(xx,yy,zz);
-                }
-            }
+        Tensor res(lhs.r,lhs.c,lhs.d);
+        int i_max=lhs.r*lhs.c*lhs.d;
+        for(int i=0;i<i_max;i++) {
+            res.data[i]=lhs.data[i]*rhs.data[i];
         }
         return res;
     };
@@ -210,13 +190,10 @@ public:
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
     friend Tensor operator/(Tensor lhs, const Tensor &rhs){
-        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
-        for(int zz=0;zz<lhs.z;zz++){
-            for(int yy=0;yy<lhs.y;yy++){
-                for(int xx=0;xx<lhs.x;xx++){
-                    res(xx,yy,zz)=lhs(xx,yy,zz)/rhs(xx,yy,zz);
-                }
-            }
+        Tensor res(lhs.r,lhs.c,lhs.d);
+        int i_max=lhs.r*lhs.c*lhs.d;
+        for(int i=0;i<i_max;i++) {
+            res.data[i]=lhs.data[i]/rhs.data[i];
         }
         return res;
     };
@@ -232,13 +209,10 @@ public:
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
     friend Tensor operator-(Tensor lhs, const float &rhs){
-        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
-        for(int zz=0;zz<lhs.z;zz++){
-            for(int yy=0;yy<lhs.y;yy++){
-                for(int xx=0;xx<lhs.x;xx++){
-                    res(xx,yy,zz)=lhs(xx,yy,zz)/rhs;
-                }
-            }
+        Tensor res(lhs.r,lhs.c,lhs.d);
+        int i_max=lhs.r*lhs.c*lhs.d;
+        for(int i=0;i<i_max;i++) {
+            res.data[i]=lhs.data[i]-rhs;
         }
         return res;
     };
@@ -254,13 +228,10 @@ public:
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
     friend Tensor operator+(Tensor lhs, const float &rhs){
-        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
-        for(int zz=0;zz<lhs.z;zz++){
-            for(int yy=0;yy<lhs.y;yy++){
-                for(int xx=0;xx<lhs.x;xx++){
-                    res(xx,yy,zz)=lhs(xx,yy,zz)+rhs;
-                }
-            }
+        Tensor res(lhs.r,lhs.c,lhs.d);
+        int i_max=lhs.r*lhs.c*lhs.d;
+        for(int i=0;i<i_max;i++) {
+            res.data[i]=lhs.data[i]+rhs;
         }
         return res;
     };
@@ -276,13 +247,10 @@ public:
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
     friend Tensor operator*(Tensor lhs, const float &rhs){
-        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
-        for(int zz=0;zz<lhs.z;zz++){
-            for(int yy=0;yy<lhs.y;yy++){
-                for(int xx=0;xx<lhs.x;xx++){
-                    res(xx,yy,zz)=lhs(xx,yy,zz)*rhs;
-                }
-            }
+        Tensor res(lhs.r,lhs.c,lhs.d);
+        int i_max=lhs.r*lhs.c*lhs.d;
+        for(int i=0;i<i_max;i++) {
+            res.data[i]=lhs.data[i]*rhs;
         }
         return res;
     };
@@ -298,13 +266,10 @@ public:
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
     friend Tensor operator/(Tensor lhs, const float &rhs){
-        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
-        for(int zz=0;zz<lhs.z;zz++){
-            for(int yy=0;yy<lhs.y;yy++){
-                for(int xx=0;xx<lhs.x;xx++){
-                    res(xx,yy,zz)=lhs(xx,yy,zz)/rhs;
-                }
-            }
+        Tensor res(lhs.r,lhs.c,lhs.d);
+        int i_max=lhs.r*lhs.c*lhs.d;
+        for(int i=0;i<i_max;i++) {
+            res.data[i]=lhs.data[i]/rhs;
         }
         return res;
     };
@@ -316,7 +281,12 @@ public:
      * 
      * @return a pointer to the receiver object
      */
-    Tensor & operator=(const Tensor &other);
+    Tensor & operator=(const Tensor &other){
+        r=other.r;
+        c=other.c;
+        d=other.d;  //aggiorno
+        return *this;
+    };
 
     /**
      * Random Initialization
@@ -327,7 +297,6 @@ public:
      * @param std  Standard deviation
      */
     void init_random(float mean=1.0, float std=0.0){
-        /*
         if(data){
             float y1;
             float y2;
@@ -345,7 +314,7 @@ public:
 
         }else{
             throw(tensor_not_initialized());
-        }*/
+        }
     }
 
     /**
@@ -358,7 +327,7 @@ public:
      * @param d The depth
      * @param v The initialization value
      */
-    void init(int r, int c, int d, float v=0.0);
+    void init(int r, int c, int d, float v=0.0);//aspettare documentazione maggiore
 
     /**
      * Tensor Clamp
@@ -369,15 +338,14 @@ public:
      * @param high Higher value 
      */
     void clamp(float low, float high){
-    	for(int zz=0; zz<z; zz++)
-            for(int yy=0; yy<y; yy++)
-                for(int xx=0; xx<x; xx++){
-                    float elem = data(xx, yy, zz);
-                    if(elem < low)
-                        data(xx, yy, zz) = low;
-                    else if(elem > high)
-                        data(xx, yy, zz) = high;
-                }
+        int i_max=r*c*d;
+        for(int i=0;i<i_max;i++){
+            float elem = data[i];
+            if(elem < low)
+                data[i] = low;
+            else if(elem > high)
+                data[i] = high;
+        }
     };
 
     /**
@@ -395,6 +363,7 @@ public:
      * @param new_max New maximum vale
      */
     void rescale(float new_max=1.0){
+        /*
         //trovo max value dim 1
         float max{};
         float min{};
@@ -410,7 +379,7 @@ public:
 
 
 
-
+*/
 
     };
 
@@ -426,21 +395,23 @@ public:
      * @return the padded tensor
      */
     Tensor padding(int pad_h, int pad_w){
-        Tensor res(x+2*pad_h, y+2*pad_w, z);
+        Tensor res(r+2*pad_w, c+2*pad_h, d);
         int i=0;
-        float new_x = x+2*pad_h;
-        float new_y = x+2*pad_w;
-        for(int zz=0; zz<z; zz++){
-            for(int yy=0; yy<new_y; yy++){
-                for(int xx=0; xx<new_x; xx++){
-                    if(xx < pad_h || xx > x+pad_h || yy < pad_w || yy > y+pad_w){   //da controllare !!
-                        res.data(xx, yy, zz) = 0.0;
+        int new_x = r+2*pad_h;
+        int new_y = c+2*pad_w;
+        for(int z=0; z<d; z++){
+            for(int y=0; y<new_y; y++){
+                for(int x=0; x<new_x; x++){
+                    if(x < pad_w || x >= r+pad_w || y < pad_h || y >= c+pad_h){   //da controllare !!
+                        res(x, y, z) = 0.0;
                     }else{
-                        res.data(xx, yy, zz) = data[i++];
+                        res(x,y,z) = data[i++];
                     }
+
                 }
             }
         }
+        return res;
     };
 
     /**
@@ -461,7 +432,11 @@ public:
      * @param depth_end
      * @return the subset of the original tensor
      */
-    Tensor subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end, unsigned int depth_start, unsigned int depth_end);
+    Tensor subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end, unsigned int depth_start, unsigned int depth_end){
+
+
+
+    };
 
     /** 
      * Concatenate 
@@ -482,7 +457,11 @@ public:
      * @param axis The axis along which perform the concatenation 
      * @return a new Tensor containing the result of the concatenation
      */
-    Tensor concat(const Tensor &rhs, int axis=0);
+    Tensor concat(const Tensor &rhs, int axis=0){
+
+
+
+    };
 
 
     /** 
@@ -497,7 +476,11 @@ public:
      * @param f The filter
      * @return a new Tensor containing the result of the convolution
      */
-    Tensor convolve(const Tensor &f);
+    Tensor convolve(const Tensor &f){
+
+
+
+    };
 
     /* UTILITY */
 
