@@ -18,8 +18,6 @@ using namespace std;
 //IMPLEMENTARE INSERIMENTO ALL INTERO DELL ARRAY
 
 
-
-
 class Tensor{
 private:
     float * data;
@@ -110,7 +108,9 @@ public:
         return res;
         //TODO EXCEPTION
     };
-
+    int at(int i,int j,int k){
+        return k*x*y+(j*x+i);
+    };
     /**
      * Copy constructor
      * 
@@ -118,7 +118,9 @@ public:
      *      
      * @return the new Tensor
      */
-    Tensor(const Tensor& that);
+    Tensor(const Tensor& that){
+
+    };
 
     /**
      * Operator oveloding -
@@ -130,7 +132,17 @@ public:
      * 
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
-    friend Tensor operator-(Tensor lhs, const Tensor &rhs);
+    friend Tensor operator-(Tensor lhs, const Tensor &rhs){
+        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
+        for(int zz=0;zz<lhs.z;zz++){
+            for(int yy=0;yy<lhs.y;yy++){
+                for(int xx=0;xx<lhs.x;xx++){
+                    res(xx,yy,zz)=lhs(xx,yy,zz)-rhs(xx,yy,zz);
+                }
+            }
+        }
+        return res;
+    };
 
     /**
      * Operator oveloding +
@@ -142,7 +154,17 @@ public:
      * 
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
-    friend Tensor operator+(Tensor lhs, const Tensor &rhs);
+    friend Tensor operator+(Tensor lhs, const Tensor &rhs){
+        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
+        for(int zz=0;zz<lhs.z;zz++){
+            for(int yy=0;yy<lhs.y;yy++){
+                for(int xx=0;xx<lhs.x;xx++){
+                    res(xx,yy,zz)=lhs(xx,yy,zz)+rhs(xx,yy,zz);
+                }
+            }
+        }
+        return res;
+    };
 
     /**
      * Operator oveloding *
@@ -154,7 +176,17 @@ public:
      * 
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
-    friend Tensor operator*(Tensor lhs, const Tensor &rhs);
+    friend Tensor operator*(Tensor lhs, const Tensor &rhs){
+        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
+        for(int zz=0;zz<lhs.z;zz++){
+            for(int yy=0;yy<lhs.y;yy++){
+                for(int xx=0;xx<lhs.x;xx++){
+                    res(xx,yy,zz)=lhs(xx,yy,zz)*rhs(xx,yy,zz);
+                }
+            }
+        }
+        return res;
+    };
     
     /**
      * Operator oveloding /
@@ -166,7 +198,17 @@ public:
      * 
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
-    friend Tensor operator/(Tensor lhs, const Tensor &rhs);
+    friend Tensor operator/(Tensor lhs, const Tensor &rhs){
+        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
+        for(int zz=0;zz<lhs.z;zz++){
+            for(int yy=0;yy<lhs.y;yy++){
+                for(int xx=0;xx<lhs.x;xx++){
+                    res(xx,yy,zz)=lhs(xx,yy,zz)/rhs(xx,yy,zz);
+                }
+            }
+        }
+        return res;
+    };
 
     /**
      * Operator oveloding - between a Tensor and a constant
@@ -178,7 +220,17 @@ public:
      * 
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
-    friend Tensor operator-(Tensor lhs, const float &rhs);
+    friend Tensor operator-(Tensor lhs, const float &rhs){
+        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
+        for(int zz=0;zz<lhs.z;zz++){
+            for(int yy=0;yy<lhs.y;yy++){
+                for(int xx=0;xx<lhs.x;xx++){
+                    res(xx,yy,zz)=lhs(xx,yy,zz)/rhs;
+                }
+            }
+        }
+        return res;
+    };
 
     /**
      * Operator oveloding + between a Tensor and a constant
@@ -190,7 +242,17 @@ public:
      * 
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
-    friend Tensor operator+(Tensor lhs, const float &rhs);
+    friend Tensor operator+(Tensor lhs, const float &rhs){
+        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
+        for(int zz=0;zz<lhs.z;zz++){
+            for(int yy=0;yy<lhs.y;yy++){
+                for(int xx=0;xx<lhs.x;xx++){
+                    res(xx,yy,zz)=lhs(xx,yy,zz)+rhs;
+                }
+            }
+        }
+        return res;
+    };
 
     /**
      * Operator oveloding * between a Tensor and a constant
@@ -202,7 +264,17 @@ public:
      * 
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
-    friend Tensor operator*(Tensor lhs, const float &rhs);
+    friend Tensor operator*(Tensor lhs, const float &rhs){
+        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
+        for(int zz=0;zz<lhs.z;zz++){
+            for(int yy=0;yy<lhs.y;yy++){
+                for(int xx=0;xx<lhs.x;xx++){
+                    res(xx,yy,zz)=lhs(xx,yy,zz)*rhs;
+                }
+            }
+        }
+        return res;
+    };
     
     /**
      * Operator oveloding / between a Tensor and a constant
@@ -214,7 +286,17 @@ public:
      * 
      * @return lhs with the result of the operation (lhs is passed by copy, so is a new lhs ;) )
      */
-    friend Tensor operator/(Tensor lhs, const float &rhs);
+    friend Tensor operator/(Tensor lhs, const float &rhs){
+        Tensor res(lhs.x,lhs.y,lhs.z,0.0);
+        for(int zz=0;zz<lhs.z;zz++){
+            for(int yy=0;yy<lhs.y;yy++){
+                for(int xx=0;xx<lhs.x;xx++){
+                    res(xx,yy,zz)=lhs(xx,yy,zz)/rhs;
+                }
+            }
+        }
+        return res;
+    };
 
     /**
      * Operator oveloding = (assignment) 
@@ -285,12 +367,31 @@ public:
      * newvalue(i,j,k) = ((data(i,j,k)-min(k))/(max(k)-min(k)))*new_max
      * 
      * where max(k) and min(k) are the maximum and minimum value in the k-th channel.
+     * MAX(K) e MIN(K) corrispondono al massimo valore e al minimo valore presente in quella specifica dimensione
      * 
      * new_max is the new value for the maximum
      * 
      * @param new_max New maximum vale
      */
-    void rescale(float new_max=1.0);
+    void rescale(float new_max=1.0){
+        //trovo max value dim 1
+        float max{};
+        float min{};
+        for(int zz=0;zz<z;zz++){
+            for(int yy=0;yy<y;yy++){
+                int indice=this->at(0,yy,zz);
+                for(int xx=0;xx<x;xx++){
+                    data[indice+x]
+                }
+            }
+        }
+
+
+
+
+
+
+    };
 
     /**
      * Tensor padding
