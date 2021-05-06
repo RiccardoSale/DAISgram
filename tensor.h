@@ -20,19 +20,19 @@ private:
     float * data;
     int r,c,d;
 public:
-    //stampa provvisoria
     void stampa(){
-        for(int zz=0;zz<d;zz++){
-            for(int yy=0;yy<c;yy++){
-                for(int xx=0;xx<r;xx++){
-                    std::cout<<data[zz*r*c+(yy*r+xx)]<<"||";
-                }
-                std::cout<<"\n";
-            }
-            std::cout<<"\n"<<"nuova dim"<<"\n";
+        int i_max=r*c*d;
+        for(int i=0;i<i_max;i++){
+            if(i%(c*r)==0 && i!=0)
+                cout<<"\n"<<"dim"<<"\n";
+            else if(i%c==0 && i!=0)
+                cout<<"\n";
+            cout<<data[i]<<"||";
         }
-    }
+        cout<<"\n";
 
+
+    }
     /**
      * Class constructor
      * 
@@ -82,7 +82,7 @@ public:
      * @return the value at location [i][j][k]
      */
     float operator()(int i, int j, int k) const{
-        return data[k*r*c+(j*r+i)];
+        return data[k*r*c+(i*c+j)];
         //TODO EXCEPTION
     };
 
@@ -97,12 +97,13 @@ public:
      * @return the pointer to the location [i][j][k]
      */
     float &operator()(int i, int j, int k){
-        float& res=data[k*r*c+(j*r+i)];
+        float& res=data[k*r*c+(i*c+j)];
         return res;
         //TODO EXCEPTION
     };
     int at(int i,int j,int k){
-        return k*r*c+(j*r+i);
+        return k*r*c+(i*c+j);
+        //j*r salto tot righe
     };
     /**
      * Copy constructor
@@ -285,7 +286,7 @@ public:
         r=other.r;
         c=other.c;
         d=other.d;  //aggiorno
-        return *this;
+        return *this; //NON SICURO 100% di questa riga
     };
 
     /**
@@ -363,24 +364,27 @@ public:
      * @param new_max New maximum vale
      */
     void rescale(float new_max=1.0){
-        /*
         //trovo max value dim 1
-        float max{};
-        float min{};
-        for(int zz=0;zz<z;zz++){
-            for(int yy=0;yy<y;yy++){
-                int indice=this->at(0,yy,zz);
-                for(int xx=0;xx<x;xx++){
-                    data[indice+x]
+        float max{data[0]};
+        float min{data[0]};
+        for(int z=0;z<d;z++) {
+            for (int y = 0; y < c; y++) { // Da testare probabilmente scambiare c e r
+                int i = this->at(0, y, z);
+                for (int x = 0; x < r; x++) {
+                    if (data[i + r] < min)
+                        min = data[i + r];
+                    else if (data[i + r] > max)
+                        max = data[i + r];
+                }
+            }//a questo punto dovrei aver trovato maggiore e minore per quella dimensione
+            float diff = max - min;
+            for (int y = 0; y < c; y++) {
+                int i = this->at(0, y, z);
+                for (int x = 0; x < r; x++) {
+                    data[i + r] = ((data[i + r] - min) / (diff)) * new_max;
                 }
             }
         }
-
-
-
-
-*/
-
     };
 
     /**
@@ -395,19 +399,21 @@ public:
      * @return the padded tensor
      */
     Tensor padding(int pad_h, int pad_w){
-        Tensor res(r+2*pad_w, c+2*pad_h, d);
+        cout<<r<<c<<"\n";
+        int new_x = c+2*pad_w; //nuovo numero colonne
+        int new_y = r+2*pad_h; //nuovo numero righe
+        Tensor res(new_y, new_x, d);
         int i=0;
-        int new_x = r+2*pad_h;
-        int new_y = c+2*pad_w;
-        for(int z=0; z<d; z++){
+        int ii=0;
+        cout<<new_x<<new_y<<"\n";
+        for(int z=0; z<d; z++){ //scorro dimensioni
             for(int y=0; y<new_y; y++){
                 for(int x=0; x<new_x; x++){
-                    if(x < pad_w || x >= r+pad_w || y < pad_h || y >= c+pad_h){   //da controllare !!
-                        res(x, y, z) = 0.0;
+                    if(x < pad_w || x >= c+pad_w || y < pad_h || y >= r+pad_h){
+                        res.data[ii++]=0.0;
                     }else{
-                        res(x,y,z) = data[i++];
+                        res.data[ii++]=data[i++];
                     }
-
                 }
             }
         }
@@ -433,9 +439,21 @@ public:
      * @return the subset of the original tensor
      */
     Tensor subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end, unsigned int depth_start, unsigned int depth_end){
-
-
-
+        Tensor res(row_end-row_start,col_end-col_start,depth_end-depth_start);
+        cout<<res.r<<"dsda";
+        cout<<res.c<<"dsd";
+        cout<<res.d<<"dsds"<<"\n";
+        int i{0};
+        Tensor att= (*this);
+        for(int z=res.d;z<depth_end;z++){
+            for(int y=res.c;y<col_end;y++){
+                for(int x=res.r;x<row_end;x++){
+                   cout<< att.data[(z*r*c)+(y*r+(x))]<<"||"<<"AAAAAAAAA";
+                   res.data[i++]=att.data[(z*r*c)+(y*r+(x))];
+                }
+            }
+        }
+        return res;
     };
 
     /** 
