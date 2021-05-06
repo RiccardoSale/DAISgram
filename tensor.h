@@ -30,8 +30,6 @@ public:
             cout<<data[i]<<"||";
         }
         cout<<"\n";
-
-
     }
     /**
      * Class constructor
@@ -439,6 +437,7 @@ public:
      * @return the subset of the original tensor
      */
     Tensor subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end, unsigned int depth_start, unsigned int depth_end){
+        /* DA FINIRE !!
         Tensor res(row_end-row_start,col_end-col_start,depth_end-depth_start);
         cout<<res.r<<"dsda";
         cout<<res.c<<"dsd";
@@ -454,6 +453,7 @@ public:
             }
         }
         return res;
+         */
     };
 
     /** 
