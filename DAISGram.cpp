@@ -13,6 +13,7 @@ using namespace std;
  *
  * @param filename String containing the path of the file
  */
+/*
 void DAISGram::load_image(string filename){
     BmpImg img = BmpImg();
 
@@ -31,7 +32,7 @@ void DAISGram::load_image(string filename){
         }                
     }
 }
-
+*/
 
 /**
  * Save a DAISGram object to a bitmap file.
@@ -40,6 +41,7 @@ void DAISGram::load_image(string filename){
  *
  * @param filename String containing the path where to store the image.
  */
+/*
 void DAISGram::save_image(string filename){
 
     data.clamp(0,255);
@@ -57,7 +59,7 @@ void DAISGram::save_image(string filename){
     img.write(filename);
 
 }
-
+*/
 
 /**
  * Generate Random Image

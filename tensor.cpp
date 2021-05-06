@@ -13,15 +13,6 @@
 
 using namespace std;
 
-/*
- int at(int i,int j,int k){
-     return k*r*c+(i*c+j);
-     //j*r salto tot righe
- };
- */
-
-
-
 /**
 * Class constructor
 *
@@ -44,7 +35,7 @@ Tensor::Tensor(){
 * @param v
 * @return new Tensor
 */
-Tensor::Tensor(int r, int c, int d, float v = 0.0){
+Tensor::Tensor(int r, int c, int d, float v){
     this->r=r;
     this->c=c;
     this->d=d;
@@ -73,8 +64,11 @@ void init_progressive();
  * @return the value at location [i][j][k]
  */
 float Tensor::operator()(int i, int j, int k) const{
-    return data[k*r*c+(i*c+j)];
-    //TODO EXCEPTION
+    if(i>r || j>c || k>d){
+        throw (index_out_of_bound());
+    }else{
+        return data[k*r*c+(i*c+j)];
+    }
 };
 
 /**
@@ -88,9 +82,12 @@ float Tensor::operator()(int i, int j, int k) const{
  * @return the pointer to the location [i][j][k]
  */
 float& Tensor::operator()(int i, int j, int k){
-    float& res=data[k*r*c+(i*c+j)];
-    return res;
-    //TODO EXCEPTION
+    if(i>r || j>c || k>d){
+        throw (index_out_of_bound());
+    }else{
+        float& res=data[k*r*c+(i*c+j)];
+        return res;
+    }
 };
 
 /**
@@ -128,7 +125,6 @@ Tensor Tensor::operator-(const Tensor &rhs){
         for(int i=0;i<i_max;i++) {
             result.data[i] = data[i] - rhs.data[i];
         }
-
         return result;
     }else{
         throw(dimension_mismatch());
@@ -153,7 +149,6 @@ Tensor Tensor::operator +(const Tensor &rhs){
         for(int i=0;i<i_max;i++) {
             result.data[i] = data[i] + rhs.data[i];
         }
-
         return result;
     }else{
         throw(dimension_mismatch());
@@ -178,7 +173,6 @@ Tensor Tensor::operator*(const Tensor &rhs){
         for(int i=0;i<i_max;i++) {
             result.data[i] = data[i] * rhs.data[i];
         }
-
         return result;
     }else{
         throw(dimension_mismatch());
@@ -203,7 +197,6 @@ Tensor Tensor::operator /(const Tensor &rhs){
         for(int i=0;i<i_max;i++) {
             result.data[i] = data[i] / rhs.data[i];
         }
-
         return result;
     }else{
         throw(dimension_mismatch());
@@ -225,7 +218,6 @@ Tensor Tensor::operator-(const float &rhs){
     for(int i=0;i<i_max;i++) {
         result.data[i] = data[i]-rhs;
     }
-
     return result;
 };
 
@@ -244,7 +236,6 @@ Tensor Tensor::operator+(const float &rhs){
     for(int i=0;i<i_max;i++) {
         result.data[i] = data[i] + rhs;
     }
-
     return result;
 };
 
@@ -263,7 +254,6 @@ Tensor Tensor::operator*(const float &rhs){
     for(int i=0;i<i_max;i++) {
         result.data[i] = data[i] * rhs;
     }
-
     return result;
 };
 
@@ -282,7 +272,6 @@ Tensor Tensor::operator/(const float &rhs){
     for(int i=0;i<i_max;i++) {
         result.data[i] = data[i] / rhs;
     }
-
     return result;
 };
 
@@ -339,7 +328,17 @@ void Tensor::init_random(float mean, float std){
  * @param d The depth
  * @param v The initialization value
  */
-void Tensor::init(int r, int c, int d, float v=0.0){};//aspettare documentazione maggiore
+void Tensor::init(int r, int c, int d, float v){
+    this->r=r;
+    this->c=c;
+    this->d=d;
+    int i_max{r*c*d};
+    data=new float[i_max];
+    for(int i=0;i<i_max;i++){
+        data[i]=v;
+    }
+
+};//aspettare documentazione maggiore
 
 /**
  * Tensor Clamp
@@ -373,13 +372,13 @@ void Tensor::clamp(float low, float high){//POTREBBE ESSERE CHE DOBBIAMO IMPOSTA
  *
  * @param new_max New maximum vale
  */
-void Tensor:: rescale(float new_max=1.0){
+void Tensor:: rescale(float new_max){
     //trovo max value dim 1
     float max{data[0]};
     float min{data[0]};
     for(int z=0;z<d;z++) {
         for (int y = 0; y < c; y++) { // Da testare probabilmente scambiare c e r
-            int i = this->at(0, y, z); 
+            int i = z*r*c+(y*c);
             for (int x = 0; x < r; x++) {
                 if (data[i + r] < min)
                     min = data[i + r];
@@ -389,9 +388,9 @@ void Tensor:: rescale(float new_max=1.0){
         }//a questo punto dovrei aver trovato maggiore e minore per quella dimensione
         float diff = max - min;
         for (int y = 0; y < c; y++) {
-            int i = this->at(0, y, z);
+            int i = z*r*c+(y*c);
             for (int x = 0; x < r; x++) {
-                data[i + r] = ((data[i + r] - min) / (diff)) * new_max;
+                data[i + r] = ((data[i + r] - min) / (diff)) * new_max; //vedere caso 0/0
             }
         }
     }
@@ -448,19 +447,14 @@ Tensor Tensor::padding(int pad_h, int pad_w){
  */
 Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end, unsigned int depth_start, unsigned int depth_end){
     Tensor res(row_end-row_start,col_end-col_start,depth_end-depth_start);
-    cout<<res.r<<"dsda";
-    cout<<res.c<<"dsd";
-    cout<<res.d<<"dsds"<<"\n";
-    int i{0};
-    Tensor att= (*this);
-    for(int z=res.d;z<depth_end;z++){
-        for(int y=res.c;y<col_end;y++){
-            for(int x=res.r;x<row_end;x++){
-               cout<< att.data[(z*r*c)+(y*r+(x))]<<"||"<<"AAAAAAAAA";
-               res.data[i++]=att.data[(z*r*c)+(y*r+(x))];
+    int i=0;
+    for(int z=depth_start;z<depth_end;z++){
+        for(int y=col_start;y<col_end;y++){
+            for(int x=row_start;x<row_end;x++){
+               res.data[i++]=data[(z*r*c)+y*c+x];
             }
         }
-    }
+    };
     return res;
 };
 
@@ -507,21 +501,27 @@ Tensor concat(const Tensor &rhs, int axis=0);
      *
      * @return the number of rows in the tensor
      */
-    int rows();
+    int Tensor::rows(){
+        return r;
+    };
 
     /**
      * Cols
      *
      * @return the number of columns in the tensor
      */
-    int cols();
+    int Tensor::cols(){
+        return c;
+    };
 
     /**
      * Depth
      *
      * @return the depth of the tensor
      */
-    int depth();
+    int Tensor::depth(){
+        return d;
+    };
     
     /**
      * Get minimum
@@ -530,7 +530,15 @@ Tensor concat(const Tensor &rhs, int axis=0);
      *
      * @return the minimum of data( , , k)
      */
-    float getMin(int k);
+    float Tensor::getMin(int k){
+        float min=data[0];
+        int stop=k*r*c+r*c;
+        for(int i=k*r*c;i<stop;i++){
+            if(data[i]<min)
+                min=data[i];
+        };
+        return min;
+    };
 
     /**
      * Get maximum
@@ -539,7 +547,15 @@ Tensor concat(const Tensor &rhs, int axis=0);
      *
      * @return the maximum of data( , , k)
      */
-    float getMax(int k);
+    float Tensor::getMax(int k){
+        float max=data[0];
+        int stop=k*r*c+r*c;
+        for(int i=k*r*c;i<stop;i++){
+            if(data[i]>max)
+                max=data[i];
+        };
+        return max;
+    };
 
     /**
      * showSize
@@ -550,10 +566,11 @@ Tensor concat(const Tensor &rhs, int axis=0);
      * rows" x "colums" x "depth
      *
      */
-    void showSize();
+    void Tensor::showSize(){
+        cout<< r << "x" << c << "x" << d;
+    };
     
     /* IOSTREAM */
-
     /**
      * Operator overloading <<
      *
@@ -566,7 +583,7 @@ Tensor concat(const Tensor &rhs, int axis=0);
      * ...
      * [..., ..., k]
      */
-    friend ostream& operator<< (ostream& stream, const Tensor & obj);
+    //friend ostream& operator<< (ostream& stream, const Tensor & obj);
 
     /**
      * Reading from file
@@ -595,7 +612,9 @@ Tensor concat(const Tensor &rhs, int axis=0);
      *
      * @param filename the filename where the tensor is stored
      */
-    void read_file(string filename);
+    void Tensor::read_file(string filename){
+
+    };
 
     /**
      * Write the tensor to a file
@@ -623,6 +642,13 @@ Tensor concat(const Tensor &rhs, int axis=0);
      * if the file is not reachable throw unable_to_read_file()
      *
      */
-    void write_file(string filename);
+    void Tensor::write_file(string filename){ //todo exception
+        ofstream f(filename);
+        f<<r<<endl;
+        f<<c<<endl;
+        f<<d<<endl;
+        for(int i=0;i<r*c*d;i++){
+            f<<data[i]<<endl;
+        }
+    };
 
-};
