@@ -121,8 +121,18 @@ Tensor::Tensor(const Tensor& that){
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor operator-(const Tensor &rhs){
-    
+Tensor Tensor::operator-(const Tensor &rhs){
+    if(r == rhs.r && c == rhs.c && d == rhs.d){
+        Tensor result(r, c, d);
+        int i_max{r*c*d};
+        for(int i=0;i<i_max;i++) {
+            result.data[i] = data[i] - rhs.data[i];
+        }
+
+        return result;
+    }else{
+        throw(dimension_mismatch());
+    }
 };
 
 /**
@@ -136,7 +146,19 @@ Tensor operator-(const Tensor &rhs){
  *
  * @return returns a new Tensor containing the result of the operation
 */
-Tensor operator +(const Tensor &rhs);
+Tensor Tensor::operator +(const Tensor &rhs){
+    if(r == rhs.r && c == rhs.c && d == rhs.d){
+        Tensor result(r, c, d);
+        int i_max{r*c*d};
+        for(int i=0;i<i_max;i++) {
+            result.data[i] = data[i] + rhs.data[i];
+        }
+
+        return result;
+    }else{
+        throw(dimension_mismatch());
+    }
+};
 
 /**
  * Operator overloading *
@@ -149,7 +171,19 @@ Tensor operator +(const Tensor &rhs);
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor operator*(const Tensor &rhs);
+Tensor Tensor::operator*(const Tensor &rhs){
+    if(r == rhs.r && c == rhs.c && d == rhs.d){
+        Tensor result(r, c, d);
+        int i_max{r*c*d};
+        for(int i=0;i<i_max;i++) {
+            result.data[i] = data[i] * rhs.data[i];
+        }
+
+        return result;
+    }else{
+        throw(dimension_mismatch());
+    }
+};
 
 /**
  * Operator overloading /
@@ -162,7 +196,19 @@ Tensor operator*(const Tensor &rhs);
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor operator/(const Tensor &rhs);
+Tensor Tensor::operator /(const Tensor &rhs){
+    if(r == rhs.r && c == rhs.c && d == rhs.d){
+        Tensor result(r, c, d);
+        int i_max{r*c*d};
+        for(int i=0;i<i_max;i++) {
+            result.data[i] = data[i] / rhs.data[i];
+        }
+
+        return result;
+    }else{
+        throw(dimension_mismatch());
+    }
+};
 
 /**
  * Operator overloading -
@@ -173,7 +219,15 @@ Tensor operator/(const Tensor &rhs);
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor operator-(const float &rhs);
+Tensor Tensor::operator-(const float &rhs){
+    Tensor result(r, c, d);
+    int i_max{r*c*d};
+    for(int i=0;i<i_max;i++) {
+        result.data[i] = data[i]-rhs;
+    }
+
+    return result;
+};
 
 /**
  * Operator overloading +
@@ -184,7 +238,15 @@ Tensor operator-(const float &rhs);
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor operator+(const float &rhs);
+Tensor Tensor::operator+(const float &rhs){
+    Tensor result(r, c, d);
+    int i_max{r*c*d};
+    for(int i=0;i<i_max;i++) {
+        result.data[i] = data[i] + rhs;
+    }
+
+    return result;
+};
 
 /**
  * Operator overloading *
@@ -195,7 +257,15 @@ Tensor operator+(const float &rhs);
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor operator*(const float &rhs);
+Tensor Tensor::operator*(const float &rhs){
+    Tensor result(r, c, d);
+    int i_max{r*c*d};
+    for(int i=0;i<i_max;i++) {
+        result.data[i] = data[i] * rhs;
+    }
+
+    return result;
+};
 
 /**
  * Operator overloading / between a Tensor and a constant
@@ -206,7 +276,15 @@ Tensor operator*(const float &rhs);
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor operator/(const float &rhs);
+Tensor Tensor::operator/(const float &rhs){
+    Tensor result(r, c, d);
+    int i_max{r*c*d};
+    for(int i=0;i<i_max;i++) {
+        result.data[i] = data[i] / rhs;
+    }
+
+    return result;
+};
 
 /**
  * Operator overloading = (assignment)
@@ -261,7 +339,7 @@ void Tensor::init_random(float mean, float std){
  * @param d The depth
  * @param v The initialization value
  */
-void Tensor::init(int r, int c, int d, float v=0.0);//aspettare documentazione maggiore
+void Tensor::init(int r, int c, int d, float v=0.0){};//aspettare documentazione maggiore
 
 /**
  * Tensor Clamp
@@ -301,7 +379,7 @@ void Tensor:: rescale(float new_max=1.0){
     float min{data[0]};
     for(int z=0;z<d;z++) {
         for (int y = 0; y < c; y++) { // Da testare probabilmente scambiare c e r
-            int i = this->at(0, y, z);
+            int i = this->at(0, y, z); 
             for (int x = 0; x < r; x++) {
                 if (data[i + r] < min)
                     min = data[i + r];
@@ -386,6 +464,25 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
     return res;
 };
 
+/** 
+     * Concatenate 
+     * 
+     * The function concatenates two tensors along a give axis
+     * 
+     * Example: this is of size 10x5x6 and rhs is of 25x5x6
+     * 
+     * if concat on axis 0 (row) the result will be a new Tensor of size 35x5x6
+     * 
+     * if concat on axis 1 (columns) the operation will fail because the number 
+     * of rows are different (10 and 25).
+     * 
+     * In order to perform the concatenation is mandatory that all the dimensions 
+     * different from the axis should be equal, other wise throw concat_wrong_dimension(). 
+     *  
+     * @param rhs The tensor to concatenate with
+     * @param axis The axis along which perform the concatenation 
+     * @return a new Tensor containing the result of the concatenation
+     */
 Tensor concat(const Tensor &rhs, int axis=0);
 
 
