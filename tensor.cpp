@@ -52,10 +52,8 @@ Tensor::Tensor(int r, int c, int d, float v){
  * Cleanup the data when deallocated
  */
 Tensor::~Tensor(){
-    delete data;
+    delete [] data;
 };
-
-void init_progressive();
 
 /**
  * Operator oveloding ()

@@ -53,8 +53,6 @@ public:
      */
     ~Tensor();
 
-    void init_progressive();
-
     /**
      * Operator overloading ()
      *
