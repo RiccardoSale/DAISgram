@@ -32,6 +32,10 @@ int main() {
     Tensor sub=p.subset(0,1,0,3,0,3);
     cout<<sub;
     sub.write_file("prova.txt");
+    Tensor r;
+    r.read_file("prova.txt");
+    cout<<"\n"<<"\n"<<"STAMPA TENSORE FILE"<<"\n";
+    cout<<r;
 }
 
 //int main (int argc, char * argv[]) {
