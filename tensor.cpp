@@ -481,7 +481,6 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
     if (axis == 0){ //l'asse è sulle righe
         if(c == rhs.c && d == rhs.d){
             result.r = r + rhs.r;
-            
 
             int my_pos=0;
             int rhs_pos=0;
@@ -489,8 +488,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
 
             int my_dimension = r * c;
             int rhs_dimension = rhs.r * rhs.c;
-            
-                        
+
             for(int i = 0; i < d; i++){
                 for(int j = 0; j < my_dimension; j++){
                     result.data[res_pos++] = data[my_pos++];
@@ -500,12 +498,10 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
                 }
             }
 
-
         }else{
             throw(concat_wrong_dimension());
         }
     }else if (axis == 1){
-        
         if(r == rhs.r && d == rhs.d){
             result.c = c + rhs.c;
 
@@ -525,9 +521,6 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
                     result.data[res_pos++] = rhs.data[rhs_pos++];
                 }
             }
-
-            
-
         }else{
             throw(concat_wrong_dimension());
         }
@@ -548,7 +541,9 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      * @param f The filter
      * @return a new Tensor containing the result of the convolution
      */
-    Tensor convolve(const Tensor &f);
+    Tensor convolve(const Tensor &f){
+
+    };
 
     /* UTILITY */
 
@@ -592,7 +587,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
         for(int i=k*r*c;i<stop;i++){
             if(data[i]<min)
                 min=data[i];
-        };
+        }
         return min;
     };
 
@@ -609,7 +604,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
         for(int i=k*r*c;i<stop;i++){
             if(data[i]>max)
                 max=data[i];
-        };
+        }
         return max;
     };
 
@@ -623,7 +618,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      *
      */
     void Tensor::showSize(){
-        cout<< r << "x" << c << "x" << d;
+        cout<< r << " x " << c << " x " << d;
     };
     
     /* IOSTREAM */
@@ -669,15 +664,19 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      * @param filename the filename where the tensor is stored
      */
     void Tensor::read_file(string filename){
-        istringstream iss{filename};
-        char sep;
-        iss >> r >> sep >> c >> sep >> d >> sep;
-        int dimensioni = r*c*d;
-        for(int i=0; i<dimensioni; i++){
-            iss >> data[i] >> sep;
-        }
-    };
+        ifstream f(filename,ifstream::in);
+        if(f.bad()) {
+            f >> r;
+            f >> c;
+            f >> d;
+            int max = r * c * d;
+            data = new float[max];
+            for (int i = 0; i < max; i++)
+                f >> data[i];
+        }else
+            throw(unable_to_read_file());
 
+    };
     /**
      * Write the tensor to a file
      *
@@ -704,13 +703,15 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      * if the file is not reachable throw unable_to_read_file()
      *
      */
-    void Tensor::write_file(string filename){ //todo exception
-        ofstream f(filename);
-        f<<r<<endl;
-        f<<c<<endl;
-        f<<d<<endl;
-        for(int i=0;i<r*c*d;i++){
-            f<<data[i]<<endl;
-        }
+    void Tensor::write_file(string filename){
+        ofstream f(filename,ofstream::out);
+        if(f.bad()) {
+            f << r << endl;
+            f << c << endl;
+            f << d << endl;
+            for (int i = 0; i < r * c * d; i++)
+                f << data[i] << endl;
+        }else
+            throw(unable_to_read_file());
     };
 
