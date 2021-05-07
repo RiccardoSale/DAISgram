@@ -478,7 +478,56 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
      * @param axis The axis along which perform the concatenation 
      * @return a new Tensor containing the result of the concatenation
      */
-Tensor concat(const Tensor &rhs, int axis=0);
+Tensor Tensor::concat(const Tensor &rhs, int axis=0){
+    if (axis == 0){ //l'asse è sulle righe
+        if(c == rhs.c && d == rhs.d){
+            Tensor result(r + rhs.r, c, d);
+
+            int my_pos=0;
+            int rhs_pos=0;
+            int res_pos=0;
+
+            int my_dimension = r * c;
+            int rhs_dimension = rhs.r * rhs.c;
+            
+                        
+            for(int i = 0; i < d; i++){
+                for(int j = 0; j < my_dimension; j++){
+                    result.data[res_pos++] = data[my_pos++];
+                }
+                for(int k=0; k < rhs_dimension; k++){
+                    result.data[res_pos++] = rhs.data[rhs_pos++];
+                }
+            }
+        }else{
+            throw(concat_wrong_dimension());
+        }
+    }else if (axis == 1){
+        
+        if(r == rhs.r && d == rhs.d){
+            Tensor result(r, c + rhs.c, d);
+
+            int my_pos=0;
+            int rhs_pos=0;
+            int res_pos=0;
+
+            //j e k arrivano fino a c perchè ogni c colonne sono una riga
+            //i arriva fino a r * d perchè lo devo fare per tutte r le righe e per d dimensioni
+                        
+            for(int i = 0; i < r * d; i++){
+                for(int j = 0; j < c; j++){
+                    result.data[res_pos++] = data[my_pos++];
+                }
+
+                for(int k=0; k < rhs.c; k++){
+                    result.data[res_pos++] = rhs.data[rhs_pos++];
+                }
+            }
+        }else{
+            throw(concat_wrong_dimension());
+        }
+    }
+}
 
 
     /**
