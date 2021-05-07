@@ -347,7 +347,7 @@ void Tensor::init(int r, int c, int d, float v){
  * @param low Lower value
  * @param high Higher value
  */
-void Tensor::clamp(float low, float high){//POTREBBE ESSERE CHE DOBBIAMO IMPOSTARE SOLO IL MAX E IL MIN
+void Tensor::clamp(float low, float high){
     int i_max=r*c*d;
     for(int i=0;i<i_max;i++){
         float elem = data[i];
@@ -665,7 +665,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      */
     void Tensor::read_file(string filename){
         ifstream f(filename,ifstream::in);
-        if(f.bad()) {
+        if(f.is_open()) {
             f >> r;
             f >> c;
             f >> d;
@@ -705,7 +705,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      */
     void Tensor::write_file(string filename){
         ofstream f(filename,ofstream::out);
-        if(f.bad()) {
+        if(f.is_open()) {
             f << r << endl;
             f << c << endl;
             f << d << endl;
