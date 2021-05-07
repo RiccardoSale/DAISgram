@@ -3,6 +3,7 @@
 #include <random>
 #include <math.h>
 #include <fstream>
+#include <sstream>
 
 #include "dais_exc.h"
 #include "tensor.h"
@@ -613,7 +614,13 @@ Tensor concat(const Tensor &rhs, int axis=0);
      * @param filename the filename where the tensor is stored
      */
     void Tensor::read_file(string filename){
-
+        istringstream iss{filename};
+        char sep;
+        iss >> r >> sep >> c >> sep >> d >> sep;
+        int dimensioni = r*c*d;
+        for(int i=0; i<dimensioni; i++){
+            iss >> data[i] >> sep;
+        }
     };
 
     /**
