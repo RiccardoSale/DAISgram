@@ -478,10 +478,12 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
      * @param axis The axis along which perform the concatenation 
      * @return a new Tensor containing the result of the concatenation
      */
-Tensor Tensor::concat(const Tensor &rhs, int axis=0){
+Tensor Tensor::concat(const Tensor &rhs, int axis){
+    Tensor result(r, c, d);
     if (axis == 0){ //l'asse è sulle righe
         if(c == rhs.c && d == rhs.d){
-            Tensor result(r + rhs.r, c, d);
+            result.r = r + rhs.r;
+            
 
             int my_pos=0;
             int rhs_pos=0;
@@ -499,13 +501,15 @@ Tensor Tensor::concat(const Tensor &rhs, int axis=0){
                     result.data[res_pos++] = rhs.data[rhs_pos++];
                 }
             }
+
+
         }else{
             throw(concat_wrong_dimension());
         }
     }else if (axis == 1){
         
         if(r == rhs.r && d == rhs.d){
-            Tensor result(r, c + rhs.c, d);
+            result.c = c + rhs.c;
 
             int my_pos=0;
             int rhs_pos=0;
@@ -523,10 +527,14 @@ Tensor Tensor::concat(const Tensor &rhs, int axis=0){
                     result.data[res_pos++] = rhs.data[rhs_pos++];
                 }
             }
+
+            
+
         }else{
             throw(concat_wrong_dimension());
         }
     }
+    return result;
 }
 
 
