@@ -21,8 +21,11 @@ void show_help(){
 }
 
 int main (int argc, char * argv[]) {
-
-
+    DAISGram prova;
+    prova.load_image("seba.bmp");
+    //SISTEMARE BRIGHTEN E GRAYSCALE  LOAD SAVE FUNZIONANO
+    //DAISGram g=prova.brighten(250);
+    prova.save_image("prova.bmp");
 }
     //char * fn_in_1;  /* file 1 */
     //char * fn_in_2;  /* file 2 */

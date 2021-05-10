@@ -18,9 +18,13 @@ class DAISGram{
 
     public:
 
-        DAISGram();
+        DAISGram(){
 
-        ~DAISGram();
+        };
+
+        ~DAISGram(){
+
+        };
 
         /**
          * Load a bitmap from file
@@ -28,7 +32,6 @@ class DAISGram{
          * @param filename String containing the path of the file
          */
         void load_image(string filename);
-
 
         /**
          * Save a DAISGram object to a bitmap file.

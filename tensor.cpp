@@ -3,11 +3,9 @@
 #include <random>
 #include <math.h>
 #include <fstream>
-#include <sstream>
-
 #include "dais_exc.h"
 #include "tensor.h"
-
+#include <algorithm>
 #define PI 3.141592654
 #define FLT_MAX 3.402823466e+38F /* max value */
 #define FLT_MIN 1.175494351e-38F /* min positive value */
@@ -117,7 +115,7 @@ Tensor::Tensor(const Tensor& that){
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor Tensor::operator-(const Tensor &rhs){
+Tensor Tensor::operator-(const Tensor &rhs)const{
     if(r == rhs.r && c == rhs.c && d == rhs.d){
         Tensor result(r, c, d);
         int i_max{r*c*d};
@@ -141,7 +139,7 @@ Tensor Tensor::operator-(const Tensor &rhs){
  *
  * @return returns a new Tensor containing the result of the operation
 */
-Tensor Tensor::operator +(const Tensor &rhs){
+Tensor Tensor::operator +(const Tensor &rhs)const{
     if(r == rhs.r && c == rhs.c && d == rhs.d){
         Tensor result(r, c, d);
         int i_max{r*c*d};
@@ -165,7 +163,7 @@ Tensor Tensor::operator +(const Tensor &rhs){
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor Tensor::operator*(const Tensor &rhs){
+Tensor Tensor::operator*(const Tensor &rhs)const{
     if(r == rhs.r && c == rhs.c && d == rhs.d){
         Tensor result(r, c, d);
         int i_max{r*c*d};
@@ -189,7 +187,7 @@ Tensor Tensor::operator*(const Tensor &rhs){
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor Tensor::operator /(const Tensor &rhs){
+Tensor Tensor::operator /(const Tensor &rhs)const{
     if(r == rhs.r && c == rhs.c && d == rhs.d){
         Tensor result(r, c, d);
         int i_max{r*c*d};
@@ -282,12 +280,19 @@ Tensor Tensor::operator/(const float &rhs){
  * @return a reference to the receiver object
  */
 
-Tensor & Tensor::operator=(const Tensor &other){
+Tensor & Tensor::operator=(const Tensor &other){    //controllare cambiare
+    d=other.d;
     r=other.r;
     c=other.c;
-    d=other.d;  //aggiorno
-    return *this; //NON SICURO 100% di questa riga
-};
+    int i_max{};
+    //controllare con valgrind se serve delete
+    if(!data)
+        data=new float[i_max];
+    for(int i=0;i<i_max;i++){
+        data[i]=other.data[i];
+    }
+    return *this;
+}
 
 
 /**
@@ -317,6 +322,11 @@ void Tensor::init_random(float mean, float std){
     }
 }
 
+
+
+
+
+
 /**
  * Constant Initialization
  *
@@ -332,12 +342,15 @@ void Tensor::init(int r, int c, int d, float v){
     this->c=c;
     this->d=d;
     int i_max{r*c*d};
+    /* //controllare con valgrind
+    if(data)
+        delete [] data;
+        */
     data=new float[i_max];
     for(int i=0;i<i_max;i++){
         data[i]=v;
     }
-
-};//aspettare documentazione maggiore
+}//aspettare documentazione maggiore
 
 /**
  * Tensor Clamp
@@ -356,7 +369,7 @@ void Tensor::clamp(float low, float high){
         else if(elem > high)
             data[i] = high;
     }
-};
+}
 
 /**
  * Tensor Rescaling
@@ -393,7 +406,7 @@ void Tensor:: rescale(float new_max){
             }
         }
     }
-};
+}
 
 /**
  * Tensor padding
@@ -406,7 +419,7 @@ void Tensor:: rescale(float new_max){
  * @param pad_w the width padding
  * @return the padded tensor
  */
-Tensor Tensor::padding(int pad_h, int pad_w){
+Tensor Tensor::padding(int pad_h, int pad_w)const{
     int new_x = c+2*pad_w; //nuovo numero colonne
     int new_y = r+2*pad_h; //nuovo numero righe
     Tensor res(new_y, new_x, d);
@@ -424,7 +437,7 @@ Tensor Tensor::padding(int pad_h, int pad_w){
         }
     }
     return res;
-};
+}
 
 /**
  * Subset a tensor
@@ -444,7 +457,7 @@ Tensor Tensor::padding(int pad_h, int pad_w){
  * @param depth_end
  * @return the subset of the original tensor
  */
-Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end, unsigned int depth_start, unsigned int depth_end){
+Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end, unsigned int depth_start, unsigned int depth_end)const{
     Tensor res(row_end-row_start,col_end-col_start,depth_end-depth_start);
     int i=0;
     for(int z=depth_start;z<depth_end;z++){
@@ -455,7 +468,7 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
         }
     };
     return res;
-};
+}
 
 /** 
      * Concatenate 
@@ -476,7 +489,7 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
      * @param axis The axis along which perform the concatenation 
      * @return a new Tensor containing the result of the concatenation
      */
-Tensor Tensor::concat(const Tensor &rhs, int axis){
+Tensor Tensor::concat(const Tensor &rhs, int axis)const{
     Tensor result(r, c, d);
     if (axis == 0){ //l'asse è sulle righe
         if(c == rhs.c && d == rhs.d){
@@ -541,9 +554,9 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      * @param f The filter
      * @return a new Tensor containing the result of the convolution
      */
-    Tensor convolve(const Tensor &f){
+    Tensor Tensor::convolve(const Tensor &f)const{
 
-    };
+    }
 
     /* UTILITY */
 
@@ -552,27 +565,27 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      *
      * @return the number of rows in the tensor
      */
-    int Tensor::rows(){
+    int Tensor::rows()const{
         return r;
-    };
+    }
 
     /**
      * Cols
      *
      * @return the number of columns in the tensor
      */
-    int Tensor::cols(){
+    int Tensor::cols()const{
         return c;
-    };
+    }
 
     /**
      * Depth
      *
      * @return the depth of the tensor
      */
-    int Tensor::depth(){
+    int Tensor::depth()const{
         return d;
-    };
+    }
     
     /**
      * Get minimum
@@ -581,7 +594,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      *
      * @return the minimum of data( , , k)
      */
-    float Tensor::getMin(int k){
+    float Tensor::getMin(int k)const{
         float min=data[0];
         int stop=k*r*c+r*c;
         for(int i=k*r*c;i<stop;i++){
@@ -589,7 +602,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
                 min=data[i];
         }
         return min;
-    };
+    }
 
     /**
      * Get maximum
@@ -598,7 +611,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      *
      * @return the maximum of data( , , k)
      */
-    float Tensor::getMax(int k){
+    float Tensor::getMax(int k)const{
         float max=data[0];
         int stop=k*r*c+r*c;
         for(int i=k*r*c;i<stop;i++){
@@ -606,7 +619,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
                 max=data[i];
         }
         return max;
-    };
+    }
 
     /**
      * showSize
@@ -617,9 +630,9 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
      * rows" x "colums" x "depth
      *
      */
-    void Tensor::showSize(){
+    void Tensor::showSize()const{
         cout<< r << " x " << c << " x " << d;
-    };
+    }
     
     /* IOSTREAM */
     /**
@@ -676,7 +689,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
         }else
             throw(unable_to_read_file());
 
-    };
+    }
     /**
      * Write the tensor to a file
      *
@@ -713,5 +726,5 @@ Tensor Tensor::concat(const Tensor &rhs, int axis){
                 f << data[i] << endl;
         }else
             throw(unable_to_read_file());
-    };
+    }
 
