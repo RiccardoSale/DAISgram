@@ -62,6 +62,60 @@ void DAISGram::save_image(string filename){
 */
 
 /**
+    * Get rows
+    *
+    * @return returns the number of rows in the image
+    */
+        int DAISGram::getRows(){
+            return data.rows();
+        }
+
+/**
+    * Get columns
+    *
+    * @return returns the number of columns in the image
+    */
+        int DAISGram::getCols(){
+            return data.cols();
+        }
+
+/**
+    * Get depth
+    *
+    * @return returns the number of channels in the image
+    */
+        int DAISGram::getDepth(){
+            return data.depth();
+        }
+
+/**
+         * Create a grayscale version of the object
+         * 
+         * A grayscale image is produced by substituting each pixel with its average on all the channel
+         *  
+         * @return returns a new DAISGram containing the modified object
+         */
+        DAISGram DAISGram::grayscale(){
+            int i_max = data.rows() * data.cols() * data.depth();
+            float sum = 0;
+            DAISGram result;
+
+            for(int i=0; i < data.rows(); i++){
+                for (int j = 0; j < data.cols(); j++){
+                    for (int k = 0; k < data.depth(); k++){
+                        sum += data(i, j, k);
+                    }
+                }                
+            }
+
+            float avarage = sum / i_max;
+            
+            result.data.init(data.rows(), data.cols(), data.depth(), avarage);
+
+            return result;
+
+        }
+/**
  * Generate Random Image
  * 
  * Generate a random image from nois
