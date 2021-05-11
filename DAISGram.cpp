@@ -107,6 +107,51 @@ void DAISGram::save_image(string filename){
             result.data.clamp(0,255);
             return result;
         }
+
+
+    /**
+     * Create a Warhol effect on the image
+     * 
+     * This function returns a composition of 4 different images in which the:
+     * - top left is the original image
+     * - top right is the original image in which the Red and Green channel are swapped
+     * - bottom left is the original image in which the Blue and Green channel are swapped
+     * - bottom right is the original image in which the Red and Blue channel are swapped
+     *  
+     * The output image is twice the dimensions of the original one.
+     * 
+     * @return returns a new DAISGram containing the modified object
+     */
+    DAISGram DAISGram::warhol(){
+        Tensor verde, rosso, blu, originale;
+        originale = Tensor(data);
+        verde = Tensor(data);
+        for(int i=0; i<data.rows(); i++){
+            for(int j=0; j<data.cols(); j++){
+                for(int k=0; k<data.depth(); k++){
+                    if(data.rows() == 0){
+                        verde(i, j, k) = originale(i+1, j, k);
+                        blu(i, j, k) = originale(i+2, j, k);
+                    }else if(data.rows() == 1){
+                        rosso(i, j, k) = originale(i+1, j, k);
+                        verde(i, j, k) = originale(i-1, j, k);
+                    }else{
+                        rosso(i, j, k) = originale(i-1, j, k);
+                        blu(i, j, k) = originale(i-2, j, k);
+                    }
+                }
+            }
+        }
+        DAISGram risultato;
+        originale.concat(verde, 0);     //concatenazione delle due immagini una vicino all'altra
+        rosso.concat(blu, 0);           //concatenazione delle due immagini una vicino all'altra
+        originale.concat(rosso, 1);     //concatenazione delle due immagini una sotto l'altra
+
+        risultato.data = originale;
+        return risultato;
+    };
+
+
 /**
  * Generate Random Image
  *
