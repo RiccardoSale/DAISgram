@@ -151,6 +151,31 @@ void DAISGram::save_image(string filename){
         return risultato;
     };
 
+    /**
+     * Blend with anoter image
+     * 
+     * This function generate a new DAISGram which is the composition 
+     * of the object and another DAISGram object
+     * 
+     * The composition follows this convex combination:
+     * results = alpha*this + (1-alpha)*rhs 
+     * 
+     * rhs and this obejct MUST have the same dimensions.
+     * 
+     * @param rhs The second image involved in the blending
+     * @param alpha The parameter of the convex combination  
+     * @return returns a new DAISGram containing the blending of the two images.
+    */  
+    DAISGram blend(const DAISGram & rhs, float alpha=0.5){
+        Tensor supp;
+        DAISGram risultato;
+        risultato.data = this.operators*(alpha);
+        supp = rhs.operators*(1-alpha);
+        risultato.data.operator+(supp);
+        return risultato;
+    };    
+
+
 
 /**
  * Generate Random Image
