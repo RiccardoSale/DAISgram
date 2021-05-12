@@ -19,7 +19,6 @@ class DAISGram{
     public:
 
         DAISGram(){
-
         };
 
         ~DAISGram(){
