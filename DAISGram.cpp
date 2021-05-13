@@ -91,7 +91,6 @@ DAISGram DAISGram::grayscale() {
                 result.data(i, j, 0) = sum;
                 result.data(i, j, 1) = sum;
                 result.data(i, j, 2) = sum;
-
             }
         }
     }
@@ -137,15 +136,36 @@ DAISGram DAISGram::warhol() {
     return risultato;
 }
 
-
-DAISGram blend(const DAISGram & rhs, float alpha=0.5){
+//risultato ->alpha*data + rhs.data*(1-alpha)
+DAISGram DAISGram::blend(const DAISGram & rhs, float alpha){
     Tensor supp;
     DAISGram risultato;
-    risultato.data = this.operators*(alpha);
-    supp = rhs.operators*(1-alpha);
-    risultato.data.operator+(supp);
+    risultato.data = data*(alpha) + (rhs.data*(1-alpha));
     return risultato;
 };
+
+DAISGram DAISGram::sharpen() {
+    DAISGram res;
+    Tensor f(3, 3, 3);
+    int max = f.depth() * f.cols() * f.rows();
+    int cf = 0;
+    for (int i = 0; i < max; i++) {
+        if (cf == 9)
+            cf = 0;
+        if (cf % 2 == 0) {
+            if (cf == 4)
+                f.at(i) = 5;
+            else
+                f.at(i) = 0;
+        } else
+            f.at(i) = -1;
+        cf++;
+    }
+    cout<<f;
+    res.data = this->data.convolve(f);
+    res.data.clamp(0,255);
+    return res;
+}
 
 /**
  * Generate Random Image

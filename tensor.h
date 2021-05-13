@@ -62,6 +62,8 @@ public:
      */
     float operator()(int i, int j, int k) const;
 
+    float & at(int i) const;
+
     /**
      * Operator overloading ()
      *
@@ -145,7 +147,7 @@ public:
      *
      * @return returns a new Tensor containing the result of the operation
      */
-    Tensor operator-(const float &rhs);
+    Tensor operator-(const float &rhs)const;
 
     /**
      * Operator overloading +
@@ -156,7 +158,7 @@ public:
      *
      * @return returns a new Tensor containing the result of the operation
      */
-    Tensor operator+(const float &rhs);
+    Tensor operator+(const float &rhs)const;
 
     /**
      * Operator overloading *
@@ -167,7 +169,7 @@ public:
      *
      * @return returns a new Tensor containing the result of the operation
      */
-    Tensor operator*(const float &rhs);
+    Tensor operator*(const float &rhs)const;
 
     /**
      * Operator overloading / between a Tensor and a constant
@@ -178,7 +180,7 @@ public:
      *
      * @return returns a new Tensor containing the result of the operation
      */
-    Tensor operator/(const float &rhs);
+    Tensor operator/(const float &rhs)const;
 
     /**
      * Operator overloading = (assignment)

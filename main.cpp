@@ -34,6 +34,20 @@ int main (int argc, char * argv[]) {
     DAISGram war=prova;
     war=prova.warhol();
     war.save_image("warhol.bmp");
+    /*
+    DAISGram blend;
+    blend.load_image("blend_b.bmp");
+    DAISGram blend2;
+    blend2.load_image("blend_a.bmp");
+    blend=blend.blend(blend2);
+    blend.save_image("blend.bmp");
+    */
+
+
+    DAISGram ale;
+    ale.load_image("dais.bmp");
+    ale.sharpen();
+    ale.save_image("filtrosharp.bmp");
 
 }
     //char * fn_in_1;  /* file 1 */

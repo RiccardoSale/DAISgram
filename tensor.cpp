@@ -85,7 +85,13 @@ float& Tensor::operator()(int i, int j, int k){
         float& res=data[k*r*c+(i*c+j)];//dim *riga_base *col_base + righe *col_base +col
         return res;
     }
-};
+}
+
+float& Tensor::at(int i) const {
+    float &res=data[i];
+    return res;
+}
+
 
 /**
  * Copy constructor
@@ -209,7 +215,7 @@ Tensor Tensor::operator /(const Tensor &rhs)const{
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor Tensor::operator-(const float &rhs){
+Tensor Tensor::operator-(const float &rhs)const{
     Tensor result(r, c, d);
     int i_max{r*c*d};
     for(int i=0;i<i_max;i++) {
@@ -227,7 +233,7 @@ Tensor Tensor::operator-(const float &rhs){
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor Tensor::operator+(const float &rhs){
+Tensor Tensor::operator+(const float &rhs)const{
     Tensor result(r, c, d);
     int i_max{r*c*d};
     for(int i=0;i<i_max;i++) {
@@ -245,7 +251,7 @@ Tensor Tensor::operator+(const float &rhs){
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor Tensor::operator*(const float &rhs){
+Tensor Tensor::operator*(const float &rhs)const{
     Tensor result(r, c, d);
     int i_max{r*c*d};
     for(int i=0;i<i_max;i++) {
@@ -263,7 +269,7 @@ Tensor Tensor::operator*(const float &rhs){
  *
  * @return returns a new Tensor containing the result of the operation
  */
-Tensor Tensor::operator/(const float &rhs){
+Tensor Tensor::operator/(const float &rhs)const{
     Tensor result(r, c, d);
     int i_max{r*c*d};
     for(int i=0;i<i_max;i++) {
@@ -554,7 +560,49 @@ Tensor Tensor::concat(const Tensor &rhs, int axis)const{
      * @return a new Tensor containing the result of the convolution
      */
     Tensor Tensor::convolve(const Tensor &f)const{
+        Tensor res;
+        res.init(this->rows(),this->cols(),this->depth()); //risultato uguale di dim alla "matrice" originale
+        int p=(f.rows()-1)/2; //formuletta del padding
+        Tensor pad= this->padding(p,p); //tensore che ho con il padding fatto
 
+
+        int counter=0;
+        int cf=0;
+        int cd=0;
+        int sum=0;
+
+        int quadrati_riga=pad.cols()-f.cols();
+        int quadrati_altezza=pad.rows()-f.rows(); //quanti quadrati devo fare in altezza
+
+        for(int depth=0;depth<res.depth();depth++) {
+            for (int qa = 0; qa <= quadrati_altezza; qa++) {
+                for (int a = 0; a <= quadrati_riga; a++) { //quanti quadrati faccio per riga
+                    //questi due for fanno un quadrato  //ogni volta che faccio un quadrato sulla riga devo aumentare counter di partenza di 1
+
+                    counter = (pad.cols() * (qa)) + a  + depth*pad.rows()*pad.cols();// non ce il +i perche scorro solo le righe "normali"
+
+                    for (int i = 0; i < f.rows(); i++) { //ciclo per fare "3 righe" //doppio for per fare dimensione filtro
+                        counter = (pad.cols() * (i + qa)) + a + depth*pad.rows()*pad.cols(); // vado all inzio della prossima riga e aggiungo a per spostarmi di uno a destra in base al quadrato che sto facendo
+                        for (int j = 0; j < f.cols(); j++) {//ciclo per fare le "3 colonne" ogni riga  //
+                            //cout<<pad.data[counter]<<"||";
+                            //cout<<counter<<"c"<<"\n";
+                            sum += pad.data[counter++] * f.data[cf++];
+                        }
+                        //qa =profondita del cubo quindi in quel caso devo saltare più righe e dopodichè aggiungo a per spostartmi a destra
+                    }
+
+                    //dopo i due for ho un risultato da caricare
+                    //cout<<sum<<"\n";
+                    res.data[cd++] = sum;
+                    sum = 0;
+                    cf = 0;//azzero contatore filtro
+                }
+            }
+        }
+        //cout<<"PAD"<<p;
+        //cout<<res;
+        //res.clamp(0,255);
+        return res;
     }
 
     /* UTILITY */
