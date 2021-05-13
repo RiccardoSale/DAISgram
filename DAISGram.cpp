@@ -263,6 +263,39 @@ DAISGram DAISGram::emboss(){
         };
 
 /**
+         * Smooth the image
+         * 
+         * This function remove the noise in an image using convolution and an average filter
+         * of size h*h:
+         * 
+         * c = 1/(h*h)
+         * 
+         * filter[3][3]
+         *    c c c
+         *    c c c
+         *    c c c
+         *  
+         * @param h the size of the filter
+         * @return returns a new DAISGram containing the modified object
+         */
+DAISGram DAISGram::smooth(int h){
+    DAISGram res;
+    Tensor f(h, h, h);
+    int max = f.depth() * f.cols() * f.rows();
+    
+    float c = (float) 1 / (h*h) ;
+
+    for (int i = 0; i < max; i++) {
+        f.at(i) = c;
+    }
+
+    cout<<f;
+    res.data = this->data.convolve(f);
+    
+    return res;
+}
+
+/**
  * Generate Random Image
  *
  * Generate a random image from nois

@@ -60,6 +60,12 @@ int main (int argc, char * argv[]) {
     example = example.emboss();
     example.save_image("fiore_emboss.bmp");
 
+    /*Proviamo il filtro smooth*/
+    DAISGram ex;
+    ex.load_image("dais.bmp");
+    ex = ex.smooth(7);
+    ex.save_image("filtrosmooth.bmp");
+
 }
     //char * fn_in_1;  /* file 1 */
     //char * fn_in_2;  /* file 2 */
