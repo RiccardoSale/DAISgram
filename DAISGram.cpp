@@ -167,6 +167,45 @@ DAISGram DAISGram::sharpen() {
     return res;
 }
 
+
+/**
+         * Edges of an image
+         * 
+         * This function extract the edges of an image by using the convolution 
+         * operator and the following filter
+         * 
+         * 
+         * filter[3][3]
+         * -1  -1  -1
+         * -1   8  -1
+         * -1  -1  -1
+         * 
+         * Remeber to convert the image to grayscale before running the convolution.
+         * 
+         * Before returning the image, the corresponding tensor should be clamped in [0,255]
+         *  
+         * @return returns a new DAISGram containing the modified object
+         */  
+        DAISGram DAISGram::edge(){
+            DAISGram res;
+            Tensor f(3, 3, 3);
+            int max = f.depth() * f.cols() * f.rows();
+            int cf = 0;
+            for(int i=0; i<max; i++){
+                if(cf != 4){
+                    f.at(i) = -1;
+                }else{
+                    f.at(i) = 8;
+                }
+                cf++;
+            }
+            cout<<f;
+            this->grayscale();
+            res.data = this->data.convolve(f);
+            res.data.clamp(0,255);
+            return res;
+        };
+
 /**
  * Generate Random Image
  *

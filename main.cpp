@@ -43,6 +43,11 @@ int main (int argc, char * argv[]) {
     blend.save_image("blend.bmp");
     */
 
+   DAISGram prova2;
+    prova2.load_image("dais.bmp");
+    prova2 = prova2.edge();
+    prova2.save_image("filtroedge.bmp");
+
 
     DAISGram ale;
     ale.load_image("dais.bmp");
