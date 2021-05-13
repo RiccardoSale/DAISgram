@@ -51,8 +51,14 @@ int main (int argc, char * argv[]) {
 
     DAISGram ale;
     ale.load_image("dais.bmp");
-    ale.sharpen();
+    ale = ale.sharpen();
     ale.save_image("filtrosharp.bmp");
+
+    /*Proviamo il filtro emboss*/
+    DAISGram example;
+    example.load_image("blend_a.bmp");
+    example = example.emboss();
+    example.save_image("fiore_emboss.bmp");
 
 }
     //char * fn_in_1;  /* file 1 */

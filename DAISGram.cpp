@@ -167,6 +167,62 @@ DAISGram DAISGram::sharpen() {
     return res;
 }
 
+/**
+         * Emboss the image
+         * 
+         * This function makes the image embossed (a light 3D effect) by convolving it with an
+         * embossing filter
+         * 
+         * filter[3][3]
+         *    -2 -1  0
+         *    -1  1  1
+         *     0  1  2
+         * 
+         * Before returning the image, the corresponding tensor should be clamped in [0,255]
+         *  
+         * @return returns a new DAISGram containing the modified object
+         */
+DAISGram DAISGram::emboss(){
+    DAISGram res;
+    Tensor f(3, 3, 3);
+    int max = f.depth() * f.cols() * f.rows();
+    int cf = 0;
+    for (int i = 0; i < max; i++) {
+        if (cf == 9){
+            cf = 0;
+        }
+        if(cf%2 == 0){
+            if(cf == 0){
+                f.at(i) = -2;
+            }
+
+            if(cf == 2 || cf == 6){
+                f.at(i) = 0;
+            }
+
+            if(cf == 4){
+                f.at(i) = 1;
+            }
+
+            if(cf == 8){
+                f.at(i) = 2;
+            }
+        }else{
+            if(cf == 1 || cf == 3){
+                f.at(i) = -1;
+            }else{// cf == 5 || cf == 7
+                f.at(i) = 1;
+            }
+        }
+    
+        cf++;
+    }
+    cout<<f;
+    res.data = this->data.convolve(f);
+    res.data.clamp(0,255);
+    return res;
+
+}
 
 /**
          * Edges of an image
