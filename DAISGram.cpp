@@ -86,15 +86,12 @@ DAISGram DAISGram::grayscale() {
     result.data.init(data.rows(), data.cols(), data.depth());
     for (int i = 0; i < data.rows(); i++) {
         for (int j = 0; j < data.cols(); j++) {
-            for (int k = 0; k < 1; k++) {
-                sum = (data(i, j, 0) + data(i, j, 1) + data(i, j, 2)) / 3;
+                sum = (int)(data(i, j, 0) + data(i, j, 1) + data(i, j, 2)) /(int) 3;
                 result.data(i, j, 0) = sum;
                 result.data(i, j, 1) = sum;
                 result.data(i, j, 2) = sum;
-            }
         }
     }
-
     return result;
 }
 
@@ -106,43 +103,41 @@ DAISGram DAISGram::brighten(float bright) {
 }
 
 DAISGram DAISGram::warhol() {
-    Tensor rg, bg, rb,originale;
+    Tensor rg, bg, rb, originale;
     DAISGram risultato;
-    originale=data;
-    rg=data;
-    bg=data;
-    rb=data;
-
+    originale = data;
+    rg = data;
+    bg = data;
+    rb = data;
     for (int z = 0; z < data.depth(); z++) {
         for (int x = 0; x < data.rows(); x++) {
             for (int y = 0; y < data.cols(); y++) {
                 if (z == 0) {
-                    rg(x, y, z) = originale(x, y, z+1);
-                    rb(x, y, z) = originale(x, y, z+2);
-                } else if (z  == 1) {
-                    rg(x, y, z) = originale(x, y, z-1);
-                    bg(x, y, z) = originale(x, y, z+1);
+                    rg(x, y, z) = originale(x, y, z + 1);
+                    rb(x, y, z) = originale(x, y, z + 2);
+                } else if (z == 1) {
+                    rg(x, y, z) = originale(x, y, z - 1);
+                    bg(x, y, z) = originale(x, y, z + 1);
                 } else {
-                    bg(x, y, z) = originale(x, y, z-1);
-                    rb(x, y, z) = originale(x, y, z-2);
+                    bg(x, y, z) = originale(x, y, z - 1);
+                    rb(x, y, z) = originale(x, y, z - 2);
                 }
             }
         }
     }
-
-    originale=originale.concat(rg, 1);
-    bg=bg.concat(rb, 1);
-    risultato.data = originale.concat(bg,0);
+    originale = originale.concat(rg, 1);
+    bg = bg.concat(rb, 1);
+    risultato.data = originale.concat(bg, 0);
     return risultato;
 }
 
 //risultato ->alpha*data + rhs.data*(1-alpha)
-DAISGram DAISGram::blend(const DAISGram & rhs, float alpha){
+DAISGram DAISGram::blend(const DAISGram &rhs, float alpha) {
     Tensor supp;
     DAISGram risultato;
-    risultato.data = data*(alpha) + (rhs.data*(1-alpha));
+    risultato.data = data * (alpha) + (rhs.data * (1 - alpha));
     return risultato;
-};
+}
 
 DAISGram DAISGram::sharpen() {
     DAISGram res;
@@ -161,9 +156,9 @@ DAISGram DAISGram::sharpen() {
             f.at(i) = -1;
         cf++;
     }
-    cout<<f;
+
     res.data = this->data.convolve(f);
-    res.data.clamp(0,255);
+    res.data.clamp(0, 255);
     return res;
 }
 
@@ -182,44 +177,44 @@ DAISGram DAISGram::sharpen() {
          *  
          * @return returns a new DAISGram containing the modified object
          */
-DAISGram DAISGram::emboss(){
+DAISGram DAISGram::emboss() {
     DAISGram res;
     Tensor f(3, 3, 3);
     int max = f.depth() * f.cols() * f.rows();
     int cf = 0;
     for (int i = 0; i < max; i++) {
-        if (cf == 9){
+        if (cf == 9) {
             cf = 0;
         }
-        if(cf%2 == 0){
-            if(cf == 0){
+        if (cf % 2 == 0) {
+            if (cf == 0) {
                 f.at(i) = -2;
             }
 
-            if(cf == 2 || cf == 6){
+            if (cf == 2 || cf == 6) {
                 f.at(i) = 0;
             }
 
-            if(cf == 4){
+            if (cf == 4) {
                 f.at(i) = 1;
             }
 
-            if(cf == 8){
+            if (cf == 8) {
                 f.at(i) = 2;
             }
-        }else{
-            if(cf == 1 || cf == 3){
+        } else {
+            if (cf == 1 || cf == 3) {
                 f.at(i) = -1;
-            }else{// cf == 5 || cf == 7
+            } else {// cf == 5 || cf == 7
                 f.at(i) = 1;
             }
         }
-    
+
         cf++;
     }
-    cout<<f;
+
     res.data = this->data.convolve(f);
-    res.data.clamp(0,255);
+    res.data.clamp(0, 255);
     return res;
 
 }
@@ -241,26 +236,26 @@ DAISGram DAISGram::emboss(){
          * Before returning the image, the corresponding tensor should be clamped in [0,255]
          *  
          * @return returns a new DAISGram containing the modified object
-         */  
-        DAISGram DAISGram::edge(){
-            DAISGram res;
-            Tensor f(3, 3, 3);
-            int max = f.depth() * f.cols() * f.rows();
-            int cf = 0;
-            for(int i=0; i<max; i++){
-                if(cf != 4){
-                    f.at(i) = -1;
-                }else{
-                    f.at(i) = 8;
-                }
-                cf++;
-            }
-            cout<<f;
-            this->grayscale();
-            res.data = this->data.convolve(f);
-            res.data.clamp(0,255);
-            return res;
-        };
+         */
+DAISGram DAISGram::edge() {
+    DAISGram res;
+    Tensor f(3, 3, 3);
+    int max = f.depth() * f.cols() * f.rows();
+    int cf = 0;
+    for (int i = 0; i < max; i++) {
+        if (cf != 4) {
+            f.at(i) = -1;
+        } else {
+            f.at(i) = 8;
+        }
+        cf++;
+    }
+
+    this->grayscale();
+    res.data = this->data.convolve(f);
+    res.data.clamp(0, 255);
+    return res;
+};
 
 /**
          * Smooth the image
@@ -278,56 +273,91 @@ DAISGram DAISGram::emboss(){
          * @param h the size of the filter
          * @return returns a new DAISGram containing the modified object
          */
-DAISGram DAISGram::smooth(int h){
+DAISGram DAISGram::smooth(int h) {
     DAISGram res;
     Tensor f(h, h, h);
     int max = f.depth() * f.cols() * f.rows();
-    
-    float c = (float) 1 / (h*h) ;
+
+    float c = (float) 1 / (h * h);
 
     for (int i = 0; i < max; i++) {
         f.at(i) = c;
     }
-
-    cout<<f;
     res.data = this->data.convolve(f);
-    
+
     return res;
 }
 
-/**
-         * Green Screen
-         * 
-         * This function substitutes a pixel with the corresponding one in a background image 
-         * if its colors are in the surrounding (+- threshold) of a given color (rgb).
-         * 
-         * (rgb - threshold) <= pixel <= (rgb + threshold)
-         * 
-         * 
-         * @param bkg The second image used as background
-         * @param rgb[] The color to substitute (rgb[0] = RED, rgb[1]=GREEN, rgb[2]=BLUE) 
-         * @param threshold[] The threshold to add/remove for each color (threshold[0] = RED, threshold[1]=GREEN, threshold[2]=BLUE) 
-         * @return returns a new DAISGram containing the result.
-         */  
-        DAISGram DAISGram::greenscreen(DAISGram & bkg, int rgb[], float threshold[]){};
-        /*    DAISGram res;
-            float soglia_min[3];
-            float soglia_max[3];
-            for(int i=0; i<2; i++){
-                soglia_min[i] = rgb[i] - threshold[i];
-                soglia_max[i] = rgb[i] + threshold[i];
-            }
-                
-            for (int z = 0; z < data.depth(); z++) {
-                for (int x = 0; x < data.rows(); x++) {
-                    for (int y = 0; y < data.cols(); y++) {
-                        if((data(x, y, z) >= soglia_min[z]) && (data(x, y, z) <= (soglia_max[z]))){
-                            res.data(x, y, z) = bkg.data(x, y, z);
-                        }
-                    }
+
+DAISGram DAISGram::greenscreen(DAISGram & bkg, int rgb[], float threshold[]){
+    DAISGram res;
+    res.data=this->data;
+    int val=bkg.getCols()*bkg.getRows();
+    int s_min[3];
+    int s_max[3];
+    for(int i=0; i<3; i++){
+        s_min[i] = rgb[i] - threshold[i];
+        s_max[i] = rgb[i] + threshold[i];
+    }
+    int val2=val+val;
+    for(int i=0;i<val;i++) {
+        if(res.data.at(i)>=s_min[0] && res.data.at(i)<=s_max[0])
+            if(res.data.at(i+val)>=s_min[1] && res.data.at(i+val)<=s_max[1])
+                if(res.data.at(i+val2)>=s_min[2] && res.data.at(i+val2)<=s_max[2]) {
+                    res.data.at(i)=bkg.data.at(i);
+                    res.data.at(i+val)=bkg.data.at(i+val);
+                    res.data.at(i+val2)=bkg.data.at(i+val2);
                 }
+    }
+    return res;
+}
+
+DAISGram DAISGram::equalize() { // DA TERMINARE !!
+    DAISGram res;
+    res.data.init(data.rows(),data.cols(),data.depth());
+    //res = grayscale();
+    int len = 256;
+    int c{};
+    int add;
+    for (int depth{}; depth < data.depth(); depth++) {
+        float cdf[256]={};
+        float sc = {};
+        float save;
+        add = data.rows()*data.cols() * depth;
+        c=0;
+        while (c < data.rows()*data.cols()) { //occorrenze fatte //ciclo su matrice
+            cdf[(int)data.at(c + add)]++;
+            c++;
+        }
+        c = 0;
+        while (c < len) { //creo cdf pesato
+            if(cdf[c]!=0) {
+                save = cdf[c];
+                cdf[c] = save + sc;
+                sc += save;
             }
-        };*/
+            c++;
+        }
+        c = 0;
+        while (cdf[c] == 0) {
+            c++;
+        }
+        int cdf_min = cdf[c];
+        int den = (res.getRows() * res.getCols()) -(cdf_min);
+        for (int i = 0; i < len; i++) { //normalizzato cdf
+            cdf[i] = (int)((((cdf[i] - cdf_min) / (den) ) * (len - 1)));
+        }
+        for (int i = 0; i < res.data.rows()*res.data.cols(); i++) {
+            res.data.at(i+add) = cdf[(int)data.at(i+add)];
+        }
+    }
+
+    DAISGram nuovo;
+    nuovo.load_image("results/dais_equalize.bmp");
+    cout<<(nuovo.data==res.data)<<"equalize"<<"\n";
+
+    return res;
+}
 
 /**
  * Generate Random Image

@@ -569,6 +569,7 @@ Tensor Tensor::concat(const Tensor &rhs, int axis) const {
  * @param f The filter
  * @return a new Tensor containing the result of the convolution
  */
+
 Tensor Tensor::convolve(const Tensor &f) const {
     Tensor res;
     res.init(this->rows(), this->cols(), this->depth()); //risultato uguale di dim alla "matrice" originale
@@ -593,14 +594,11 @@ Tensor Tensor::convolve(const Tensor &f) const {
                     counter = (pad.cols() * (i + qa)) + a + depth * pad.rows() *
                                                             pad.cols(); // vado all inzio della prossima riga e aggiungo a per spostarmi di uno a destra in base al quadrato che sto facendo
                     for (int j = 0; j < f.cols(); j++) {//ciclo per fare le "3 colonne" ogni riga  //
-                        //cout<<pad.data[counter]<<"||";
-                        //cout<<counter<<"c"<<"\n";
                         sum += pad.data[counter++] * f.data[cf++];
                     }
                     //qa =profondita del cubo quindi in quel caso devo saltare più righe e dopodichè aggiungo a per spostartmi a destra
                 }
                 //dopo i due for ho un risultato da caricare
-                //cout<<sum<<"\n";
                 res.data[cd++] = sum;
                 sum = 0;
                 cf = 0;//azzero contatore filtro
@@ -609,7 +607,6 @@ Tensor Tensor::convolve(const Tensor &f) const {
     }
     return res;
 }
-
 /* UTILITY */
 
 /**
@@ -685,29 +682,6 @@ float Tensor::getMax(int k) const {
 void Tensor::showSize() const {
     cout << r << " x " << c << " x " << d;
 }
-
-//Da ricontrollare
-bool Tensor::operator>=(const float &rhs) const{
-    for(int x=0; x<r; x++){
-        for(int y=0; y<c; y++){
-            if(data[y] < rhs)
-                return false;
-        }
-    }
-    return true;
-};
-
-bool Tensor::operator<=(const float &rhs) const{
-    int dim=0;
-    for(int x=0; x<r; x++){
-        for(int y=0; y<c; y++){
-            if(data[y] > rhs)
-                return false;
-        }
-    }
-    return true;
-};
-
 
 /* IOSTREAM */
 /**

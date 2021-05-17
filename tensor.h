@@ -219,10 +219,6 @@ public:
      * @return a reference to the receiver object
      */
     Tensor & operator=(const Tensor &other);
-    
-    bool operator<=(const float &rhs)const;
-    bool operator>=(const float &rhs)const;
-    
 
     /**
      * Random Initialization
