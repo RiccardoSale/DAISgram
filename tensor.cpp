@@ -686,6 +686,29 @@ void Tensor::showSize() const {
     cout << r << " x " << c << " x " << d;
 }
 
+//Da ricontrollare
+bool Tensor::operator>=(const float &rhs) const{
+    for(int x=0; x<r; x++){
+        for(int y=0; y<c; y++){
+            if(data[y] < rhs)
+                return false;
+        }
+    }
+    return true;
+};
+
+bool Tensor::operator<=(const float &rhs) const{
+    int dim=0;
+    for(int x=0; x<r; x++){
+        for(int y=0; y<c; y++){
+            if(data[y] > rhs)
+                return false;
+        }
+    }
+    return true;
+};
+
+
 /* IOSTREAM */
 /**
  * Operator overloading <<

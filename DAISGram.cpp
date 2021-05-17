@@ -296,6 +296,40 @@ DAISGram DAISGram::smooth(int h){
 }
 
 /**
+         * Green Screen
+         * 
+         * This function substitutes a pixel with the corresponding one in a background image 
+         * if its colors are in the surrounding (+- threshold) of a given color (rgb).
+         * 
+         * (rgb - threshold) <= pixel <= (rgb + threshold)
+         * 
+         * 
+         * @param bkg The second image used as background
+         * @param rgb[] The color to substitute (rgb[0] = RED, rgb[1]=GREEN, rgb[2]=BLUE) 
+         * @param threshold[] The threshold to add/remove for each color (threshold[0] = RED, threshold[1]=GREEN, threshold[2]=BLUE) 
+         * @return returns a new DAISGram containing the result.
+         */  
+        DAISGram DAISGram::greenscreen(DAISGram & bkg, int rgb[], float threshold[]){};
+        /*    DAISGram res;
+            float soglia_min[3];
+            float soglia_max[3];
+            for(int i=0; i<2; i++){
+                soglia_min[i] = rgb[i] - threshold[i];
+                soglia_max[i] = rgb[i] + threshold[i];
+            }
+                
+            for (int z = 0; z < data.depth(); z++) {
+                for (int x = 0; x < data.rows(); x++) {
+                    for (int y = 0; y < data.cols(); y++) {
+                        if((data(x, y, z) >= soglia_min[z]) && (data(x, y, z) <= (soglia_max[z]))){
+                            res.data(x, y, z) = bkg.data(x, y, z);
+                        }
+                    }
+                }
+            }
+        };*/
+
+/**
  * Generate Random Image
  *
  * Generate a random image from nois

@@ -66,6 +66,16 @@ int main (int argc, char * argv[]) {
     ex = ex.smooth(7);
     ex.save_image("filtrosmooth.bmp");
 
+    /*Proviamo il green screen*/
+    DAISGram g_screen;
+    DAISGram sfondo;
+    int rbt[3] = {0, 128, 00};
+    float threshold[3] = {10, 20, 30};
+    g_screen.load_image("gs_4.bmp");
+    sfondo.load_image("gs_4_bkg.bmp");
+    g_screen = g_screen.greenscreen(sfondo, rbt, threshold);
+    g_screen.save_image("prova_green_screen.bmp");
+
 }
     //char * fn_in_1;  /* file 1 */
     //char * fn_in_2;  /* file 2 */
