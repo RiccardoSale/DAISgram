@@ -328,7 +328,7 @@ Tensor Tensor::operator/(const float &rhs) const {
  */
 
 Tensor &Tensor::operator=(const Tensor &other) {
-    if(other.data && data){
+    if(other.data){
         d = other.d;
         r = other.r;
         c = other.c;
