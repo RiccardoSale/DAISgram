@@ -11,17 +11,20 @@ void show_help(){
     printf("\targ 4: output file name\n");
     printf("\targ 5: parametro axis della concat\n");
     printf("\n");
-};
+}
 
 int main() {
-    /*
+    Tensor rescale(3,3,3);
+    rescale.init_random(60,5);
+    cout<<rescale<<"\n"<<"\n";
+    rescale.rescale();
+    cout<<rescale<<"\n"<<"\n";
     cout<<"inizio"<<"\n";
     Tensor s1(1,1,1,10);
     Tensor t;
-    t=t+5;
+    //t=t+5;
     cout<<t;
     cout<<"fine"<<"\n";
-
     Tensor p(3, 3, 3);
     p.init_random(60,5);
     cout<<p(1,2,1)<<"ELEM";
@@ -44,18 +47,11 @@ int main() {
     r.read_file("prova.txt");
     cout<<"\n"<<"\n"<<"STAMPA TENSORE FILE"<<"\n";
     cout<<r;
-
     cout<<"\n"<<"CONCAT"<<"\n";
     Tensor concat(90,90,3,10);
     Tensor c2(90,90,3,5);
-    //cout<<concat<<"\n";
-    //cout<<c2<<"\n";
-    //cout<<"\n";
-
     Tensor res=c2.concat(concat,0);
-    //cout<< res;
     res.showSize();
-     */
 }
 
 //int main (int argc, char * argv[]) {

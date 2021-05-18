@@ -20,9 +20,7 @@ using namespace std;
 */
 Tensor::Tensor() {
     data = nullptr;
-    this->r = 0;
-    this->c = 0;
-    this->d = 0;
+    this->r = this->c = this->d = 0;
 }
 
 /**
@@ -45,7 +43,7 @@ Tensor::Tensor(int r, int c, int d, float v) {
     for (int i = 0; i < i_max; i++) {
         data[i] = v;
     }
-};
+}
 
 /**
  * Class distructor
@@ -54,7 +52,7 @@ Tensor::Tensor(int r, int c, int d, float v) {
  */
 Tensor::~Tensor() {
     delete[] data;
-};
+}
 
 /**
  * Operator oveloding ()
@@ -67,7 +65,7 @@ float Tensor::operator()(int i, int j, int k) const {
     if (i > r || j > c || k > d) {
         throw (index_out_of_bound());
     } else {
-        return data[k * r * c + (i * c + j)];
+        return data[k * r * c + (i * c + j)]; //k*r*c = salto tot dimensioni / i*c =salto tot "righe" +j= aggiungo colonne
     }
 }
 
@@ -85,15 +83,20 @@ float &Tensor::operator()(int i, int j, int k) {
     if (i > r || j > c || k > d) {
         throw (index_out_of_bound());
     } else {
-        float &res = data[k * r * c + (i * c + j)];//dim *riga_base *col_base + righe *col_base +col
+        float &res = data[k * r * c + (i * c + j)];
         return res;
     }
 }
 
-float &Tensor::at(int i) const {
+float &Tensor::at(int i) { //operatore at con reference
     float &res = data[i];
     return res;
 }
+
+float Tensor::at(int i)const { //operatore at per controllare valore
+    return data[i];
+}
+
 
 /**
  * Copy constructor
@@ -324,13 +327,12 @@ Tensor Tensor::operator/(const float &rhs) const {
  * @return a reference to the receiver object
  */
 
-Tensor &Tensor::operator=(const Tensor &other) {    //controllare cambiare
-    if(other.data){
+Tensor &Tensor::operator=(const Tensor &other) {
+    if(other.data && data){
         d = other.d;
         r = other.r;
         c = other.c;
         int i_max = r * c * d;
-        //controllare con valgrind se serve delete
         if (data)
             delete[] data;
         data = new float[i_max];
@@ -386,14 +388,13 @@ void Tensor::init(int r, int c, int d, float v) {
     this->c = c;
     this->d = d;
     int i_max{r * c * d};
-    //controllare con valgrind
     if (data)
         delete[] data;
     data = new float[i_max];
     for (int i = 0; i < i_max; i++) {
         data[i] = v;
     }
-}//aspettare documentazione maggiore
+}
 
 /**
  * Tensor Clamp
@@ -431,21 +432,27 @@ void Tensor::rescale(float new_max) {
     //trovo max value dim 1
     float max{data[0]};
     float min{data[0]};
-    for (int z = 0; z < d; z++) {
-        for (int y = 0; y < c; y++) { // Da testare probabilmente scambiare c e r
+    float val;
+    for (int z = 0; z < d; z++) { //ciclo dimensioni
+        for (int y = 0; y < r; y++) { //
             int i = z * r * c + (y * c);
             for (int x = 0; x < r; x++) {
-                if (data[i + r] < min)
-                    min = data[i + r];
-                else if (data[i + r] > max)
-                    max = data[i + r];
+                val=data[i+x];
+                if (val < min)
+                    min = val;
+                else if (val > max)
+                    max = val;
             }
         }//a questo punto dovrei aver trovato maggiore e minore per quella dimensione
         float diff = max - min;
-        for (int y = 0; y < c; y++) {
+        for (int y = 0; y < r; y++) {
             int i = z * r * c + (y * c);
-            for (int x = 0; x < r; x++) {
-                data[i + r] = ((data[i + r] - min) / (diff)) * new_max; //vedere caso 0/0
+            for (int x = 0; x < c; x++) {
+                if((data[i + x] - min)==0)
+                    data[i+x]=0;
+                else {
+                    data[i + x] = ((data[i + x] - min) / (diff)) * new_max; //vedere caso 0/0
+                }
             }
         }
     }
@@ -471,7 +478,7 @@ Tensor Tensor::padding(int pad_h, int pad_w) const {
     for (int z = 0; z < d; z++) { //scorro dimensioni
         for (int y = 0; y < new_y; y++) {
             for (int x = 0; x < new_x; x++) {
-                if (x < pad_w || x >= c + pad_w || y < pad_h || y >= r + pad_h) {
+                if (x < pad_w || x >= c + pad_w || y < pad_h || y >= r + pad_h) { //aggiungiamo 0 o valori precedentemente esistenti in base alla posizione
                     res.data[ii++] = 0.0;
                 } else {
                     res.data[ii++] = data[i++];
@@ -506,8 +513,8 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
     int i = 0;
     for (int z = depth_start; z < depth_end; z++) {
         for (int y = col_start; y < col_end; y++) {
-            for (int x = row_start; x < row_end; x++) {
-                res.data[i++] = data[(z * r * c) + y * c + x];
+            for (int x = row_start; x < row_end; x++) { //partendo dagli indici corretti ci ricaviamo la subset
+                res.data[i++] = data[(z * r * c) + y * c + x]; //salvo nel nuovo tensore il valore trovato
             }
         }
     }
@@ -535,12 +542,11 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
      */
 Tensor Tensor::concat(const Tensor &rhs, int axis) const {
     if(rhs.data && data){
+        Tensor res;
         if (axis == 0) { //l'asse è sulle righe
             if (c == rhs.c && d == rhs.d) {
-                Tensor result(r + rhs.r, c, d);
-                //result.r = r + rhs.r;
-
-                int my_pos = 0;
+                res.init(r+rhs.r,c,d);
+                int my_pos = 0; //indici vari
                 int rhs_pos = 0;
                 int res_pos = 0;
 
@@ -548,46 +554,38 @@ Tensor Tensor::concat(const Tensor &rhs, int axis) const {
                 int rhs_dimension = rhs.r * rhs.c;
 
                 for (int i = 0; i < d; i++) {
-                    for (int j = 0; j < my_dimension; j++) {
-                        result.data[res_pos++] = data[my_pos++];
+                    for (int m = 0; m < my_dimension; m++) { //copio prima tutto da uno e poi tutto dall'altro dato che ho "aumentato" num righe
+                        res.data[res_pos++] = data[my_pos++];
                     }
-                    for (int k = 0; k < rhs_dimension; k++) {
-                        result.data[res_pos++] = rhs.data[rhs_pos++];
+                    for (int rh = 0; rh < rhs_dimension; rh++) {
+                        res.data[res_pos++] = rhs.data[rhs_pos++];
                     }
                 }
-                return result;
             } else {
                 throw (concat_wrong_dimension());
             }
-        } else if (axis == 1) {
+        } else if (axis == 1) { //asse colonne
             if (r == rhs.r && d == rhs.d) {
-                Tensor result(r, c + rhs.c, d);
-
+                res.init(r,c+rhs.c,d);
                 int my_pos = 0;
                 int rhs_pos = 0;
                 int res_pos = 0;
 
-                //j e k arrivano fino a c perchè ogni c colonne sono una riga
-                //i arriva fino a r * d perchè lo devo fare per tutte r le righe e per d dimensioni
-
-                for (int i = 0; i < d; i++) {
-
-                    for (int s = 0; s < r; s++) {
-                        for (int j = 0; j < c; j++) {
-                            result.data[res_pos++] = data[my_pos++];
+                for (int i = 0; i < d; i++) { //lo faccio per tot dim
+                    for (int nr = 0; nr < r; nr++) {
+                        for (int my = 0; my < c; my++) { //inserisco la riga di this
+                            res.data[res_pos++] = data[my_pos++];
                         }
-
-                        for (int k = 0; k < rhs.c; k++) {
-                            result.data[res_pos++] = rhs.data[rhs_pos++];
+                        for (int rh = 0; rh < rhs.c; rh++) { //inserisco la riga di rhs andando a formare cosi la nuova riga di res e ripeto tot volte
+                            res.data[res_pos++] = rhs.data[rhs_pos++];
                         }
                     }
-
                 }
-                return result;
             } else {
                 throw (concat_wrong_dimension());
             }
         }
+        return res;
     }else{
         throw (tensor_not_initialized());
     }
@@ -616,22 +614,20 @@ Tensor Tensor::convolve(const Tensor &f) const {
     int cf = 0;
     int cd = 0;
     float sum = 0;
-    int quadrati_riga = pad.cols() - f.cols();
-    int quadrati_altezza = pad.rows() - f.rows(); //quanti quadrati devo fare in altezza
+    int ncube_rows = pad.cols() - f.cols();//quanti quadrati per riga
+    int ncube_high = pad.rows() - f.rows(); //quanti quadrati devo fare in altezza
 
     for (int depth = 0; depth < res.depth(); depth++) {
-        for (int qa = 0; qa <= quadrati_altezza; qa++) {
-            for (int a = 0; a <= quadrati_riga; a++) { //quanti quadrati faccio per riga
+        for (int qa = 0; qa <= ncube_high; qa++) {
+            for (int a = 0; a <= ncube_rows; a++) { //quanti quadrati faccio per riga
                 //questi due for fanno un quadrato  //ogni volta che faccio un quadrato sulla riga devo aumentare counter di partenza di 1
                 for (int i = 0; i < f.rows(); i++) { //ciclo per fare "3 righe" //doppio for per fare dimensione filtro
                     counter = (pad.cols() * (i + qa)) + a + (depth * pad.rows() *pad.cols()); // vado all inzio della prossima riga e aggiungo a per spostarmi di uno a destra in base al quadrato che sto facendo
                     for (int j = 0; j < f.cols(); j++) {//ciclo per fare le "3 colonne" ogni riga  //
                         sum += pad.data[counter++] * f.data[cf++];
-                    }
-                    //qa =profondita del cubo quindi in quel caso devo saltare più righe e dopodichè aggiungo a per spostartmi a destra
+                    }//qa =profondita del cubo quindi in quel caso devo saltare più righe e dopodichè aggiungo a per spostartmi a destra
                 }
-                //dopo i due for ho un risultato da caricare
-                res.data[cd++] = sum;
+                res.data[cd++] = sum;//dopo i due for ho un risultato da caricare
                 sum = 0;
                 cf = 0;//azzero contatore filtro
             }
@@ -679,10 +675,8 @@ int Tensor::depth() const {
 float Tensor::getMin(int k) const {
     float min = data[0];
     int stop = k * r * c + r * c;
-    for (int i = k * r * c; i < stop; i++) {
-        if (data[i] < min)
-            min = data[i];
-    }
+    for (int i = k * r * c; i < stop; i++)
+        if (data[i] < min) min = data[i];
     return min;
 }
 
@@ -696,10 +690,8 @@ float Tensor::getMin(int k) const {
 float Tensor::getMax(int k) const {
     float max = data[0];
     int stop = k * r * c + r * c;
-    for (int i = k * r * c; i < stop; i++) {
-        if (data[i] > max)
-            max = data[i];
-    }
+    for (int i = k * r * c; i < stop; i++)
+        if (data[i] > max) max = data[i];
     return max;
 }
 
@@ -716,50 +708,8 @@ void Tensor::showSize() const {
     cout << r << " x " << c << " x " << d;
 }
 
-/* IOSTREAM */
-/**
- * Operator overloading <<
- *
- * Use the overaloading of << to show the content of the tensor.
- *
- * You are free to chose the output format, btw we suggest you to show the tensor by layer.
- *
- * [..., ..., 0]
- * [..., ..., 1]
- * ...
- * [..., ..., k]
- */
-//friend ostream& operator<< (ostream& stream, const Tensor & obj);
-
-/**
- * Reading from file
- *
- * Load the content of a tensor from a textual file.
- *
- * The file should have this structure: the first three lines provide the dimensions while
- * the following lines contains the actual data by channel.
- *
- * For example, a tensor of size 4x3x2 will have the following structure:
- * 4
- * 3
- * 2
- * data(0,0,0)
- * data(0,1,0)
- * data(0,2,0)
- * data(1,0,0)
- * data(1,1,0)
- * .
- * .
- * .
- * data(3,1,1)
- * data(3,2,1)
- *
- * if the file is not reachable throw unable_to_read_file()
- *
- * @param filename the filename where the tensor is stored
- */
 void Tensor::read_file(string filename) {
-    ifstream f(filename, ifstream::in);
+    ifstream f(filename);
     if (f.is_open()) {
         f >> r;
         f >> c;
@@ -770,37 +720,10 @@ void Tensor::read_file(string filename) {
             f >> data[i];
     } else
         throw (unable_to_read_file());
-
 }
 
-/**
- * Write the tensor to a file
- *
- * Write the content of a tensor to a textual file.
- *
- * The file should have this structure: the first three lines provide the dimensions while
- * the following lines contains the actual data by channel.
- *
- * For example, a tensor of size 4x3x2 will have the following structure:
- * 4
- * 3
- * 2
- * data(0,0,0)
- * data(0,1,0)
- * data(0,2,0)
- * data(1,0,0)
- * data(1,1,0)
- * .
- * .
- * .
- * data(3,1,1)
- * data(3,2,1)
- *
- * if the file is not reachable throw unable_to_read_file()
- *
- */
 void Tensor::write_file(string filename) {
-    ofstream f(filename, ofstream::out);
+    ofstream f(filename);
     if (f.is_open()) {
         f << r << endl;
         f << c << endl;
@@ -810,4 +733,3 @@ void Tensor::write_file(string filename) {
     } else
         throw (unable_to_read_file());
 }
-

@@ -81,24 +81,19 @@ int DAISGram::getDepth() {
          * @return returns a new DAISGram containing the modified object
          */
 DAISGram DAISGram::grayscale() {
-    float sum{};
+    float sum;
     DAISGram res;
     res.data.init(data.rows(), data.cols(), data.depth());
     for (int i = 0; i < data.rows(); i++) {
         for (int j = 0; j < data.cols(); j++) {
                 sum = (data(i, j, 0) + data(i, j, 1) + data(i, j, 2)) / 3;
-                res.data(i, j, 0) = sum;
-                res.data(i, j, 1) = sum;
-                res.data(i, j, 2) = sum;
+                res.data(i, j, 0) = res.data(i, j, 1) = res.data(i, j, 2) = sum;
         }
     }
 
     res.save_image("prova4.bmp");
     DAISGram prova;
     prova.load_image("prova4.bmp");
-
-    //cout<<prova.data;
-
 
     DAISGram nuovo;
     nuovo.load_image("results/dais_gray.bmp");
@@ -108,56 +103,53 @@ DAISGram DAISGram::grayscale() {
 }
 
 DAISGram DAISGram::brighten(float bright) {
-    DAISGram result;
-    result.data = (this->data) + bright;
-    result.data.clamp(0, 255);
+    DAISGram res;
+    res.data = (this->data) + bright;
+    res.data.clamp(0, 255);
 
     DAISGram nuovo;
     nuovo.load_image("results/dais_brighten_20.bmp");
-    cout<<"bright"<<(nuovo.data==result.data)<<"\n";
+    cout<<"bright"<<(nuovo.data==res.data)<<"\n";
 
-    return result;
+    return res;
 }
 
 DAISGram DAISGram::warhol() {
-    Tensor rg, bg, rb, originale;
-    DAISGram risultato;
-    originale = data;
-    rg = data;
-    bg = data;
-    rb = data;
+    Tensor rg, bg, rb, original;
+    DAISGram res;
+    original = rg = bg = rb = data;
     for (int z = 0; z < data.depth(); z++) {
         for (int x = 0; x < data.rows(); x++) {
             for (int y = 0; y < data.cols(); y++) {
                 if (z == 0) {
-                    rg(x, y, z) = originale(x, y, z + 1);
-                    rb(x, y, z) = originale(x, y, z + 2);
+                    rg(x, y, z) = original(x, y, z + 1);
+                    rb(x, y, z) = original(x, y, z + 2);
                 } else if (z == 1) {
-                    rg(x, y, z) = originale(x, y, z - 1);
-                    bg(x, y, z) = originale(x, y, z + 1);
+                    rg(x, y, z) = original(x, y, z - 1);
+                    bg(x, y, z) = original(x, y, z + 1);
                 } else {
-                    bg(x, y, z) = originale(x, y, z - 1);
-                    rb(x, y, z) = originale(x, y, z - 2);
+                    bg(x, y, z) = original(x, y, z - 1);
+                    rb(x, y, z) = original(x, y, z - 2);
                 }
             }
         }
     }
-    originale = originale.concat(rg, 1);
+    original = original.concat(rg, 1);
     bg = bg.concat(rb, 1);
-    risultato.data = originale.concat(bg, 0);
+    res.data = original.concat(bg, 0);
 
     DAISGram nuovo;
     nuovo.load_image("results/dais_warhol.bmp");
-    cout<<"warhol"<<(nuovo.data==risultato.data)<<"\n";
+    cout<<"warhol"<<(nuovo.data==res.data)<<"\n";
 
-    return risultato;
+    return res;
 }
 
 
 DAISGram DAISGram::blend(const DAISGram &rhs, float alpha) {
     Tensor supp;
     DAISGram res;
-    res.data = data * (alpha) + (rhs.data * (1 - alpha));
+    res.data = (data * alpha) + (rhs.data * (1 - alpha));
 
     res.save_image("prova1.bmp");
     DAISGram prova;
@@ -227,33 +219,27 @@ DAISGram DAISGram::emboss() {
             if (cf == 0) {
                 f.at(i) = -2;
             }
-
             if (cf == 2 || cf == 6) {
                 f.at(i) = 0;
             }
-
             if (cf == 4) {
                 f.at(i) = 1;
             }
-
             if (cf == 8) {
                 f.at(i) = 2;
             }
-        } else {
+        }else {
             if (cf == 1 || cf == 3) {
                 f.at(i) = -1;
-            } else {// cf == 5 || cf == 7
+            } else {
                 f.at(i) = 1;
             }
         }
-
         cf++;
     }
-
     res.data = this->data.convolve(f);
     res.data.clamp(0, 255);
     return res;
-
 }
 
 /**
@@ -382,7 +368,7 @@ DAISGram DAISGram::equalize() { // DA TERMINARE !!
     DAISGram res;
     res.data.init(data.rows(),data.cols(),data.depth());
     int len = 256;
-    int c{};
+    int c;
     int add;
     for (int depth{}; depth < data.depth(); depth++) {
         float cdf[256]={};

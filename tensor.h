@@ -60,8 +60,7 @@ public:
      * @return the value at location [i][j][k]
      */
     float operator()(int i, int j, int k) const;
-
-    float & at(int i) const;
+    float at(int i)const;
 
     /**
      * Operator overloading ()
@@ -74,6 +73,8 @@ public:
      * @return the pointer to the location [i][j][k]
      */
     float &operator()(int i, int j, int k);
+
+    float &at(int i);
 
     /**
      * Copy constructor
