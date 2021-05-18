@@ -14,6 +14,7 @@ void show_help(){
 };
 
 int main() {
+    /*
     cout<<"inizio"<<"\n";
     Tensor s1(1,1,1,10);
     Tensor t;
@@ -54,6 +55,7 @@ int main() {
     Tensor res=c2.concat(concat,0);
     //cout<< res;
     res.showSize();
+     */
 }
 
 //int main (int argc, char * argv[]) {

@@ -82,23 +82,40 @@ int DAISGram::getDepth() {
          */
 DAISGram DAISGram::grayscale() {
     float sum{};
-    DAISGram result;
-    result.data.init(data.rows(), data.cols(), data.depth());
+    DAISGram res;
+    res.data.init(data.rows(), data.cols(), data.depth());
     for (int i = 0; i < data.rows(); i++) {
         for (int j = 0; j < data.cols(); j++) {
-                sum = (int)(data(i, j, 0) + data(i, j, 1) + data(i, j, 2)) /(int) 3;
-                result.data(i, j, 0) = sum;
-                result.data(i, j, 1) = sum;
-                result.data(i, j, 2) = sum;
+                sum = (data(i, j, 0) + data(i, j, 1) + data(i, j, 2)) / 3;
+                res.data(i, j, 0) = sum;
+                res.data(i, j, 1) = sum;
+                res.data(i, j, 2) = sum;
         }
     }
-    return result;
+
+    res.save_image("prova4.bmp");
+    DAISGram prova;
+    prova.load_image("prova4.bmp");
+
+    //cout<<prova.data;
+
+
+    DAISGram nuovo;
+    nuovo.load_image("results/dais_gray.bmp");
+    cout<<"gray"<<(nuovo.data==prova.data)<<"\n";
+
+    return res;
 }
 
 DAISGram DAISGram::brighten(float bright) {
     DAISGram result;
     result.data = (this->data) + bright;
     result.data.clamp(0, 255);
+
+    DAISGram nuovo;
+    nuovo.load_image("results/dais_brighten_20.bmp");
+    cout<<"bright"<<(nuovo.data==result.data)<<"\n";
+
     return result;
 }
 
@@ -128,15 +145,29 @@ DAISGram DAISGram::warhol() {
     originale = originale.concat(rg, 1);
     bg = bg.concat(rb, 1);
     risultato.data = originale.concat(bg, 0);
+
+    DAISGram nuovo;
+    nuovo.load_image("results/dais_warhol.bmp");
+    cout<<"warhol"<<(nuovo.data==risultato.data)<<"\n";
+
     return risultato;
 }
 
-//risultato ->alpha*data + rhs.data*(1-alpha)
+
 DAISGram DAISGram::blend(const DAISGram &rhs, float alpha) {
     Tensor supp;
-    DAISGram risultato;
-    risultato.data = data * (alpha) + (rhs.data * (1 - alpha));
-    return risultato;
+    DAISGram res;
+    res.data = data * (alpha) + (rhs.data * (1 - alpha));
+
+    res.save_image("prova1.bmp");
+    DAISGram prova;
+    prova.load_image("prova1.bmp");
+
+    DAISGram nuovo;
+    nuovo.load_image("results/blend/blend_0.75.bmp");
+    cout<<"blend"<<(prova.data==nuovo.data)<<"\n";
+
+    return res;
 }
 
 DAISGram DAISGram::sharpen() {
@@ -159,6 +190,12 @@ DAISGram DAISGram::sharpen() {
 
     res.data = this->data.convolve(f);
     res.data.clamp(0, 255);
+
+
+    DAISGram nuovo;
+    nuovo.load_image("results/dais_sharp.bmp");
+    cout<<"sharp"<<(nuovo.data==res.data)<<"\n";
+
     return res;
 }
 
@@ -243,6 +280,8 @@ DAISGram DAISGram::edge() {
     int max = f.depth() * f.cols() * f.rows();
     int cf = 0;
     for (int i = 0; i < max; i++) {
+        if(cf==9)
+            cf=0;
         if (cf != 4) {
             f.at(i) = -1;
         } else {
@@ -251,11 +290,22 @@ DAISGram DAISGram::edge() {
         cf++;
     }
 
-    this->grayscale();
-    res.data = this->data.convolve(f);
-    res.data.clamp(0, 255);
+    *this=this->grayscale();
+    res.data=this->data.convolve(f);
+    res.data.clamp(0,255);
+
+
+    res.save_image("prova2.bmp");
+    DAISGram prova;
+    prova.load_image("prova2.bmp");
+
+
+    DAISGram nuovo;
+    nuovo.load_image("results/dais_edge.bmp");
+    cout<<"edge"<<(nuovo.data==prova.data)<<"\n";
+
     return res;
-};
+}
 
 /**
          * Smooth the image
@@ -278,12 +328,23 @@ DAISGram DAISGram::smooth(int h) {
     Tensor f(h, h, h);
     int max = f.depth() * f.cols() * f.rows();
 
-    float c = (float) 1 / (h * h);
+    float c = (1.0 / (h * h));
 
     for (int i = 0; i < max; i++) {
         f.at(i) = c;
     }
-    res.data = this->data.convolve(f);
+    res.data = data.convolve(f);
+
+
+    res.save_image("prova3.bmp");
+    DAISGram prova;
+    prova.load_image("prova3.bmp");
+
+
+
+    DAISGram nuovo;
+    nuovo.load_image("results/dais_smooth_3.bmp");
+    cout<<"smooth"<<(nuovo.data==prova.data)<<"\n";
 
     return res;
 }
@@ -309,13 +370,17 @@ DAISGram DAISGram::greenscreen(DAISGram & bkg, int rgb[], float threshold[]){
                     res.data.at(i+val2)=bkg.data.at(i+val2);
                 }
     }
+
+    DAISGram nuovo;
+    nuovo.load_image("results/greenscreen/seba_flower.bmp");
+    cout<<"greenscale"<<(nuovo.data==res.data)<<"\n";
+
     return res;
 }
 
 DAISGram DAISGram::equalize() { // DA TERMINARE !!
     DAISGram res;
     res.data.init(data.rows(),data.cols(),data.depth());
-    //res = grayscale();
     int len = 256;
     int c{};
     int add;

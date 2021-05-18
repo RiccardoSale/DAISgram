@@ -572,14 +572,14 @@ Tensor Tensor::concat(const Tensor &rhs, int axis) const {
 
 Tensor Tensor::convolve(const Tensor &f) const {
     Tensor res;
-    res.init(this->rows(), this->cols(), this->depth()); //risultato uguale di dim alla "matrice" originale
+    res.init(rows(), cols(), depth()); //risultato uguale di dim alla "matrice" originale
     int p = (f.rows() - 1) / 2; //formuletta del padding
-    Tensor pad = this->padding(p, p); //tensore che ho con il padding fatto
+    Tensor pad = padding(p, p); //tensore che ho con il padding fatto
 
-    int counter = 0;
+    int counter;
     int cf = 0;
     int cd = 0;
-    int sum = 0;
+    float sum = 0;
     int quadrati_riga = pad.cols() - f.cols();
     int quadrati_altezza = pad.rows() - f.rows(); //quanti quadrati devo fare in altezza
 
@@ -587,12 +587,8 @@ Tensor Tensor::convolve(const Tensor &f) const {
         for (int qa = 0; qa <= quadrati_altezza; qa++) {
             for (int a = 0; a <= quadrati_riga; a++) { //quanti quadrati faccio per riga
                 //questi due for fanno un quadrato  //ogni volta che faccio un quadrato sulla riga devo aumentare counter di partenza di 1
-
-                counter = (pad.cols() * (qa)) + a +
-                          depth * pad.rows() * pad.cols();// non ce il +i perche scorro solo le righe "normali"
                 for (int i = 0; i < f.rows(); i++) { //ciclo per fare "3 righe" //doppio for per fare dimensione filtro
-                    counter = (pad.cols() * (i + qa)) + a + depth * pad.rows() *
-                                                            pad.cols(); // vado all inzio della prossima riga e aggiungo a per spostarmi di uno a destra in base al quadrato che sto facendo
+                    counter = (pad.cols() * (i + qa)) + a + (depth * pad.rows() *pad.cols()); // vado all inzio della prossima riga e aggiungo a per spostarmi di uno a destra in base al quadrato che sto facendo
                     for (int j = 0; j < f.cols(); j++) {//ciclo per fare le "3 colonne" ogni riga  //
                         sum += pad.data[counter++] * f.data[cf++];
                     }
@@ -607,6 +603,7 @@ Tensor Tensor::convolve(const Tensor &f) const {
     }
     return res;
 }
+
 /* UTILITY */
 
 /**
