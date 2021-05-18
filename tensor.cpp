@@ -103,22 +103,34 @@ float &Tensor::at(int i) const {
  * @return the new Tensor
  */
 Tensor::Tensor(const Tensor &that) {
-    r = that.r;
-    c = that.c;
-    d = that.d;
-    int i_max{r * c * d};
-    data = new float[i_max];
-    for (int i = 0; i < i_max; i++) {
-        data[i] = that.data[i];
+    if (that.data){
+        r = that.r;
+        c = that.c;
+        d = that.d;
+        int i_max{r * c * d};
+        data = new float[i_max];
+        for (int i = 0; i < i_max; i++) {
+            data[i] = that.data[i];
+        }
+    }else{
+        throw (tensor_not_initialized());
     }
 }
 
 bool Tensor::operator==(const Tensor& rhs) const {
-    int max = this->rows() * this->cols() * this->depth();
-    for (int i = 0; i < max; i++)
-        if (abs(this->data[i] - rhs.data[i]) >= EPSILON)
-            return false;
-    return true;
+    if(rhs.data && data){
+        if(r == rhs.r && c == rhs.c && d == rhs.d){
+            int max = this->rows() * this->cols() * this->depth();
+            for (int i = 0; i < max; i++)
+                if (abs(this->data[i] - rhs.data[i]) >= EPSILON)
+                    return false;
+            return true;
+        }else{
+            throw (dimension_mismatch());
+        }
+    }else{
+        throw (tensor_not_initialized());
+    }
 }
 /**
  * Operator overloading -
@@ -132,15 +144,19 @@ bool Tensor::operator==(const Tensor& rhs) const {
  * @return returns a new Tensor containing the result of the operation
  */
 Tensor Tensor::operator-(const Tensor &rhs) const {
-    if (r == rhs.r && c == rhs.c && d == rhs.d) {
-        Tensor result(r, c, d);
-        int i_max{r * c * d};
-        for (int i = 0; i < i_max; i++) {
-            result.data[i] = data[i] - rhs.data[i];
+    if(rhs.data && data){
+        if (r == rhs.r && c == rhs.c && d == rhs.d) {
+            Tensor result(r, c, d);
+            int i_max{r * c * d};
+            for (int i = 0; i < i_max; i++) {
+                result.data[i] = data[i] - rhs.data[i];
+            }
+            return result;
+        } else {
+            throw (dimension_mismatch());
         }
-        return result;
-    } else {
-        throw (dimension_mismatch());
+    }else{
+        throw (tensor_not_initialized());
     }
 }
 
@@ -156,15 +172,19 @@ Tensor Tensor::operator-(const Tensor &rhs) const {
  * @return returns a new Tensor containing the result of the operation
 */
 Tensor Tensor::operator+(const Tensor &rhs) const {
-    if (r == rhs.r && c == rhs.c && d == rhs.d) {
-        Tensor result(r, c, d);
-        int i_max{r * c * d};
-        for (int i = 0; i < i_max; i++) {
-            result.data[i] = data[i] + rhs.data[i];
+    if(rhs.data && data){
+        if (r == rhs.r && c == rhs.c && d == rhs.d) {
+            Tensor result(r, c, d);
+            int i_max{r * c * d};
+            for (int i = 0; i < i_max; i++) {
+                result.data[i] = data[i] + rhs.data[i];
+            }
+            return result;
+        }else{
+            throw (dimension_mismatch());
         }
-        return result;
-    } else {
-        throw (dimension_mismatch());
+    }else{
+        throw (tensor_not_initialized());
     }
 }
 
@@ -180,15 +200,19 @@ Tensor Tensor::operator+(const Tensor &rhs) const {
  * @return returns a new Tensor containing the result of the operation
  */
 Tensor Tensor::operator*(const Tensor &rhs) const {
-    if (r == rhs.r && c == rhs.c && d == rhs.d) {
-        Tensor result(r, c, d);
-        int i_max{r * c * d};
-        for (int i = 0; i < i_max; i++) {
-            result.data[i] = data[i] * rhs.data[i];
+    if(rhs.data && data){
+        if (r == rhs.r && c == rhs.c && d == rhs.d) {
+            Tensor result(r, c, d);
+            int i_max{r * c * d};
+            for (int i = 0; i < i_max; i++) {
+                result.data[i] = data[i] * rhs.data[i];
+            }
+            return result;
+        } else {
+            throw (dimension_mismatch());
         }
-        return result;
-    } else {
-        throw (dimension_mismatch());
+    }else{
+        throw (tensor_not_initialized());   
     }
 }
 
@@ -204,15 +228,19 @@ Tensor Tensor::operator*(const Tensor &rhs) const {
  * @return returns a new Tensor containing the result of the operation
  */
 Tensor Tensor::operator/(const Tensor &rhs) const {
-    if (r == rhs.r && c == rhs.c && d == rhs.d) {
-        Tensor result(r, c, d);
-        int i_max{r * c * d};
-        for (int i = 0; i < i_max; i++) {
-            result.data[i] = data[i] / rhs.data[i];
+    if(rhs.data && data){
+        if (r == rhs.r && c == rhs.c && d == rhs.d) {
+            Tensor result(r, c, d);
+            int i_max{r * c * d};
+            for (int i = 0; i < i_max; i++) {
+                result.data[i] = data[i] / rhs.data[i];
+            }
+            return result;
+        } else {
+            throw (dimension_mismatch());
         }
-        return result;
-    } else {
-        throw (dimension_mismatch());
+    }else{
+        throw (tensor_not_initialized());
     }
 }
 
@@ -297,18 +325,22 @@ Tensor Tensor::operator/(const float &rhs) const {
  */
 
 Tensor &Tensor::operator=(const Tensor &other) {    //controllare cambiare
-    d = other.d;
-    r = other.r;
-    c = other.c;
-    int i_max = r * c * d;
-    //controllare con valgrind se serve delete
-    if (data)
-        delete[] data;
-    data = new float[i_max];
-    for (int i = 0; i < i_max; i++) {
-        data[i] = other.data[i];
+    if(other.data){
+        d = other.d;
+        r = other.r;
+        c = other.c;
+        int i_max = r * c * d;
+        //controllare con valgrind se serve delete
+        if (data)
+            delete[] data;
+        data = new float[i_max];
+        for (int i = 0; i < i_max; i++) {
+            data[i] = other.data[i];
+        }
+        return *this;
+    }else{
+        throw (tensor_not_initialized());
     }
-    return *this;
 }
 
 
@@ -502,58 +534,62 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
      * @return a new Tensor containing the result of the concatenation
      */
 Tensor Tensor::concat(const Tensor &rhs, int axis) const {
-    if (axis == 0) { //l'asse è sulle righe
-        if (c == rhs.c && d == rhs.d) {
-            Tensor result(r + rhs.r, c, d);
-            //result.r = r + rhs.r;
+    if(rhs.data && data){
+        if (axis == 0) { //l'asse è sulle righe
+            if (c == rhs.c && d == rhs.d) {
+                Tensor result(r + rhs.r, c, d);
+                //result.r = r + rhs.r;
 
-            int my_pos = 0;
-            int rhs_pos = 0;
-            int res_pos = 0;
+                int my_pos = 0;
+                int rhs_pos = 0;
+                int res_pos = 0;
 
-            int my_dimension = r * c;
-            int rhs_dimension = rhs.r * rhs.c;
+                int my_dimension = r * c;
+                int rhs_dimension = rhs.r * rhs.c;
 
-            for (int i = 0; i < d; i++) {
-                for (int j = 0; j < my_dimension; j++) {
-                    result.data[res_pos++] = data[my_pos++];
-                }
-                for (int k = 0; k < rhs_dimension; k++) {
-                    result.data[res_pos++] = rhs.data[rhs_pos++];
-                }
-            }
-            return result;
-        } else {
-            throw (concat_wrong_dimension());
-        }
-    } else if (axis == 1) {
-        if (r == rhs.r && d == rhs.d) {
-            Tensor result(r, c + rhs.c, d);
-
-            int my_pos = 0;
-            int rhs_pos = 0;
-            int res_pos = 0;
-
-            //j e k arrivano fino a c perchè ogni c colonne sono una riga
-            //i arriva fino a r * d perchè lo devo fare per tutte r le righe e per d dimensioni
-
-            for (int i = 0; i < d; i++) {
-
-                for (int s = 0; s < r; s++) {
-                    for (int j = 0; j < c; j++) {
+                for (int i = 0; i < d; i++) {
+                    for (int j = 0; j < my_dimension; j++) {
                         result.data[res_pos++] = data[my_pos++];
                     }
-
-                    for (int k = 0; k < rhs.c; k++) {
+                    for (int k = 0; k < rhs_dimension; k++) {
                         result.data[res_pos++] = rhs.data[rhs_pos++];
                     }
                 }
-
+                return result;
+            } else {
+                throw (concat_wrong_dimension());
             }
-            return result;
-        } else {
-            throw (concat_wrong_dimension());
+        } else if (axis == 1) {
+            if (r == rhs.r && d == rhs.d) {
+                Tensor result(r, c + rhs.c, d);
+
+                int my_pos = 0;
+                int rhs_pos = 0;
+                int res_pos = 0;
+
+                //j e k arrivano fino a c perchè ogni c colonne sono una riga
+                //i arriva fino a r * d perchè lo devo fare per tutte r le righe e per d dimensioni
+
+                for (int i = 0; i < d; i++) {
+
+                    for (int s = 0; s < r; s++) {
+                        for (int j = 0; j < c; j++) {
+                            result.data[res_pos++] = data[my_pos++];
+                        }
+
+                        for (int k = 0; k < rhs.c; k++) {
+                            result.data[res_pos++] = rhs.data[rhs_pos++];
+                        }
+                    }
+
+                }
+                return result;
+            } else {
+                throw (concat_wrong_dimension());
+            }
         }
+    }else{
+        throw (tensor_not_initialized());
     }
 }
 
