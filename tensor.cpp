@@ -257,12 +257,16 @@ Tensor Tensor::operator/(const Tensor &rhs) const {
  * @return returns a new Tensor containing the result of the operation
  */
 Tensor Tensor::operator-(const float &rhs) const {
-    Tensor result(r, c, d);
-    int i_max{r * c * d};
-    for (int i = 0; i < i_max; i++) {
-        result.data[i] = data[i] - rhs;
+    if(data){
+        Tensor result(r, c, d);
+        int i_max{r * c * d};
+        for (int i = 0; i < i_max; i++) {
+            result.data[i] = data[i] - rhs;
+        }
+        return result;
+    }else{
+        throw (tensor_not_initialized());
     }
-    return result;
 }
 
 /**
@@ -275,12 +279,16 @@ Tensor Tensor::operator-(const float &rhs) const {
  * @return returns a new Tensor containing the result of the operation
  */
 Tensor Tensor::operator+(const float &rhs) const {
-    Tensor result(r, c, d);
-    int i_max{r * c * d};
-    for (int i = 0; i < i_max; i++) {
-        result.data[i] = data[i] + rhs;
+    if(data){
+        Tensor result(r, c, d);
+        int i_max{r * c * d};
+        for (int i = 0; i < i_max; i++) {
+            result.data[i] = data[i] + rhs;
+        }
+        return result;
+    }else{
+        throw (tensor_not_initialized());
     }
-    return result;
 }
 
 /**
@@ -293,12 +301,16 @@ Tensor Tensor::operator+(const float &rhs) const {
  * @return returns a new Tensor containing the result of the operation
  */
 Tensor Tensor::operator*(const float &rhs) const {
-    Tensor result(r, c, d);
-    int i_max{r * c * d};
-    for (int i = 0; i < i_max; i++) {
-        result.data[i] = data[i] * rhs;
+    if(data){
+        Tensor result(r, c, d);
+        int i_max{r * c * d};
+        for (int i = 0; i < i_max; i++) {
+            result.data[i] = data[i] * rhs;
+        }
+        return result;
+    }else{
+        throw (tensor_not_initialized());
     }
-    return result;
 }
 
 /**
@@ -311,12 +323,16 @@ Tensor Tensor::operator*(const float &rhs) const {
  * @return returns a new Tensor containing the result of the operation
  */
 Tensor Tensor::operator/(const float &rhs) const {
-    Tensor result(r, c, d);
-    int i_max{r * c * d};
-    for (int i = 0; i < i_max; i++) {
-        result.data[i] = data[i] / rhs;
+    if(data){
+        Tensor result(r, c, d);
+        int i_max{r * c * d};
+        for (int i = 0; i < i_max; i++) {
+            result.data[i] = data[i] / rhs;
+        }
+        return result;
+    }else{
+        throw (tensor_not_initialized());
     }
-    return result;
 }
 
 /**
@@ -355,21 +371,15 @@ Tensor &Tensor::operator=(const Tensor &other) {
  * @param std  Standard deviation
  */
 void Tensor::init_random(float mean, float std) {
-    if (data) {
+    std::default_random_engine generator;
+    std::normal_distribution<float> distribution(mean, std);
 
-        std::default_random_engine generator;
-        std::normal_distribution<float> distribution(mean, std);
-
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                for (int k = 0; k < d; k++) {
-                    this->operator()(i, j, k) = distribution(generator);
-                }
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            for (int k = 0; k < d; k++) {
+                this->operator()(i, j, k) = distribution(generator);
             }
         }
-
-    } else {
-        throw (tensor_not_initialized());
     }
 }
 
