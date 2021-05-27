@@ -74,8 +74,6 @@ int main(int argc, char *argv[]) {
     green=green.greenscreen(green2,rgb,tresh);
     green.save_image("greenscale.bmp");
 
-
-
     DAISGram equalize;
     equalize.load_image("dais.bmp");
     equalize=equalize.equalize();

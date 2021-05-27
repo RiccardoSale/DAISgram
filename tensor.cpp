@@ -371,16 +371,16 @@ Tensor &Tensor::operator=(const Tensor &other) {
  * @param std  Standard deviation
  */
 void Tensor::init_random(float mean, float std) {
-    std::default_random_engine generator;
-    std::normal_distribution<float> distribution(mean, std);
+        std::default_random_engine generator;
+        std::normal_distribution<float> distribution(mean, std);
 
-    for (int i = 0; i < r; i++) {
-        for (int j = 0; j < c; j++) {
-            for (int k = 0; k < d; k++) {
-                this->operator()(i, j, k) = distribution(generator);
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                for (int k = 0; k < d; k++) {
+                    this->operator()(i, j, k) = distribution(generator);
+                }
             }
         }
-    }
 }
 
 /**
@@ -461,7 +461,7 @@ void Tensor::rescale(float new_max) {
                 if((data[i + x] - min)==0)
                     data[i+x]=0;
                 else {
-                    data[i + x] = ((data[i + x] - min) / (diff)) * new_max; //vedere caso 0/0
+                    data[i + x] = ((data[i + x] - min) / (diff)) * new_max;
                 }
             }
         }
@@ -619,7 +619,6 @@ Tensor Tensor::convolve(const Tensor &f) const {
     res.init(rows(), cols(), depth()); //risultato uguale di dim alla "matrice" originale
     int p = (f.rows() - 1) / 2; //formuletta del padding
     Tensor pad = padding(p, p); //tensore che ho con il padding fatto
-
     int counter;
     int cf = 0;
     int cd = 0;
@@ -725,9 +724,12 @@ void Tensor::read_file(string filename) {
         f >> c;
         f >> d;
         int max = r * c * d;
+        if(data)
+            delete []data ;
         data = new float[max];
         for (int i = 0; i < max; i++)
             f >> data[i];
+        f.close();
     } else
         throw (unable_to_read_file());
 }
@@ -740,6 +742,7 @@ void Tensor::write_file(string filename) {
         f << d << endl;
         for (int i = 0; i < r * c * d; i++)
             f << data[i] << endl;
+        f.close();
     } else
         throw (unable_to_read_file());
 }

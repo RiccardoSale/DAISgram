@@ -14,6 +14,7 @@ void show_help(){
 }
 
 int main() {
+    Tensor scrittura(3,3,3,5);
     Tensor rescale(3,3,3);
     rescale.init_random(60,5);
     cout<<rescale<<"\n"<<"\n";
@@ -42,7 +43,7 @@ int main() {
     cout<<"\n"<<"SUBSET"<<"\n";
     Tensor sub=p.subset(0,1,0,3,0,3);
     cout<<sub;
-    sub.write_file("prova.txt");
+    scrittura.write_file("prova.txt");
     Tensor r;
     r.read_file("prova.txt");
     cout<<"\n"<<"\n"<<"STAMPA TENSORE FILE"<<"\n";
@@ -52,46 +53,6 @@ int main() {
     Tensor c2(90,90,3,5);
     Tensor res=c2.concat(concat,0);
     res.showSize();
-
-    /*PROVE PER TESTARE LE ECCEZIONI DEI TENSORI A NULL*/
-    cout<<"\n"<<"ECCEZIONI DEI TENSORI A NULL"<<"\n";
-    Tensor t1;
-    Tensor t2(3,3,3, 9);
-    //Tensor t3 (t1); --> copy constructor --> funziona
-
-    //cout  << (t1 == t2) ; --> operatore == --> funziona
-    //cout  << (t2 == t1) ; --> funziona
-
-    //Tensor t3 = t1 - t2; --> operatore - tra tensori --> funziona
-    //Tensor t3 = t2 - t1; --> funziona
-
-    //Tensor t3 = t1 + t2; --> operatore + tra tensori --> funziona
-    //Tensor t3 = t2 + t1; --> funziona
-
-    //Tensor t3 = t1 * t2; --> operatore * tra tensori --> funziona
-    //Tensor t3 = t2 * t1; --> funziona
-
-    //Tensor t3 = t1 / t2; --> operatore / tra tensori --> funziona
-    //Tensor t3 = t2 / t1; --> funziona
-
-    float number = 6;
-
-    //Tensor t3 = t1 - number; --> operatore - --> funziona
-
-    //Tensor t3 = t1 + number; --> operatore + --> funziona
-
-    //Tensor t3 = t1 * number; --> operatore * --> funziona
-
-    //Tensor t3 = t1 / number; --> operatore / --> funziona
-
-    //Tensor t3 = t1; --> operatore = --> funziona
-
-
-    //Tensor t3 = t1.concat(t2, 0); --> metodo concat --> funziona
-    //Tensor t3 = t2.concat(t1, 0); --> funziona
-    
-    
-    //cout << t3;
 }
 
 //int main (int argc, char * argv[]) {

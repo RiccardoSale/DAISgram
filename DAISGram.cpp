@@ -311,14 +311,8 @@ DAISGram DAISGram::edge() {
          */
 DAISGram DAISGram::smooth(int h) {
     DAISGram res;
-    Tensor f(h, h, h);
-    int max = f.depth() * f.cols() * f.rows();
-
     float c = (1.0 / (h * h));
-
-    for (int i = 0; i < max; i++) {
-        f.at(i) = c;
-    }
+    Tensor f(h,h,h,c);
     res.data = data.convolve(f);
 
 
@@ -356,7 +350,6 @@ DAISGram DAISGram::greenscreen(DAISGram & bkg, int rgb[], float threshold[]){
                     res.data.at(i+val2)=bkg.data.at(i+val2);
                 }
     }
-
     DAISGram nuovo;
     nuovo.load_image("results/greenscreen/seba_flower.bmp");
     cout<<"greenscale"<<(nuovo.data==res.data)<<"\n";
