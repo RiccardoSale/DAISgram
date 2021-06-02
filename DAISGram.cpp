@@ -90,10 +90,9 @@ DAISGram DAISGram::grayscale() {
                 res.data(i, j, 0) = res.data(i, j, 1) = res.data(i, j, 2) = sum;
         }
     }
-
-    res.save_image("prova4.bmp");
+    res.save_image("test/prova4.bmp");
     DAISGram prova;
-    prova.load_image("prova4.bmp");
+    prova.load_image("test/prova4.bmp");
 
     DAISGram nuovo;
     nuovo.load_image("results/dais_gray.bmp");
@@ -151,9 +150,9 @@ DAISGram DAISGram::blend(const DAISGram &rhs, float alpha) {
     DAISGram res;
     res.data = (data * alpha) + (rhs.data * (1 - alpha));
 
-    res.save_image("prova1.bmp");
+    res.save_image("test/prova1.bmp");
     DAISGram prova;
-    prova.load_image("prova1.bmp");
+    prova.load_image("test/prova1.bmp");
 
     DAISGram nuovo;
     nuovo.load_image("results/blend/blend_0.75.bmp");
@@ -164,25 +163,10 @@ DAISGram DAISGram::blend(const DAISGram &rhs, float alpha) {
 
 DAISGram DAISGram::sharpen() {
     DAISGram res;
-    Tensor f(3, 3, 3);
-    int max = f.depth() * f.cols() * f.rows();
-    int cf = 0;
-    for (int i = 0; i < max; i++) {
-        if (cf == 9)
-            cf = 0;
-        if (cf % 2 == 0) {
-            if (cf == 4)
-                f.at(i) = 5;
-            else
-                f.at(i) = 0;
-        } else
-            f.at(i) = -1;
-        cf++;
-    }
-
+    int arr[9]={0,-1,0,-1,5,-1,0,-1,0};
+    Tensor f(3,3,3,arr);
     res.data = this->data.convolve(f);
     res.data.clamp(0, 255);
-
 
     DAISGram nuovo;
     nuovo.load_image("results/dais_sharp.bmp");
@@ -208,35 +192,8 @@ DAISGram DAISGram::sharpen() {
          */
 DAISGram DAISGram::emboss() {
     DAISGram res;
-    Tensor f(3, 3, 3);
-    int max = f.depth() * f.cols() * f.rows();
-    int cf = 0;
-    for (int i = 0; i < max; i++) {
-        if (cf == 9) {
-            cf = 0;
-        }
-        if (cf % 2 == 0) {
-            if (cf == 0) {
-                f.at(i) = -2;
-            }
-            if (cf == 2 || cf == 6) {
-                f.at(i) = 0;
-            }
-            if (cf == 4) {
-                f.at(i) = 1;
-            }
-            if (cf == 8) {
-                f.at(i) = 2;
-            }
-        }else {
-            if (cf == 1 || cf == 3) {
-                f.at(i) = -1;
-            } else {
-                f.at(i) = 1;
-            }
-        }
-        cf++;
-    }
+    int arr[9]={-2,-1,0,-1,1,1,0,1,2};
+    Tensor f(3,3,3,arr);
     res.data = this->data.convolve(f);
     res.data.clamp(0, 255);
     return res;
@@ -262,29 +219,15 @@ DAISGram DAISGram::emboss() {
          */
 DAISGram DAISGram::edge() {
     DAISGram res;
-    Tensor f(3, 3, 3);
-    int max = f.depth() * f.cols() * f.rows();
-    int cf = 0;
-    for (int i = 0; i < max; i++) {
-        if(cf==9)
-            cf=0;
-        if (cf != 4) {
-            f.at(i) = -1;
-        } else {
-            f.at(i) = 8;
-        }
-        cf++;
-    }
-
+    int arr[9]={-1,-1,-1,-1,8,-1,-1,-1,-1};
+    Tensor f(3,3,3,arr);
     *this=this->grayscale();
     res.data=this->data.convolve(f);
     res.data.clamp(0,255);
 
-
-    res.save_image("prova2.bmp");
+    res.save_image("test/prova2.bmp");
     DAISGram prova;
-    prova.load_image("prova2.bmp");
-
+    prova.load_image("test/prova2.bmp");
 
     DAISGram nuovo;
     nuovo.load_image("results/dais_edge.bmp");
@@ -315,12 +258,9 @@ DAISGram DAISGram::smooth(int h) {
     Tensor f(h,h,h,c);
     res.data = data.convolve(f);
 
-
-    res.save_image("prova3.bmp");
+    res.save_image("test/prova3.bmp");
     DAISGram prova;
-    prova.load_image("prova3.bmp");
-
-
+    prova.load_image("test/prova3.bmp");
 
     DAISGram nuovo;
     nuovo.load_image("results/dais_smooth_3.bmp");

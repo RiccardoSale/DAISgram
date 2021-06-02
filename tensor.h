@@ -46,6 +46,10 @@ public:
     Tensor(int r, int c, int d, float v = 0.0);
 
     /**
+     *
+     */
+    Tensor(int r,int c,int d,int a[]);
+    /**
      * Class distructor
      *
      * Cleanup the data when deallocated

@@ -44,6 +44,27 @@ Tensor::Tensor(int r, int c, int d, float v) {
         data[i] = v;
     }
 }
+/**
+ * Creates a tensor of size r*c*d from an array that represents each of the d dimension
+ * The array must have the correct size of r*c
+ * @param r
+ * @param c
+ * @param d
+ * @param a
+ */
+Tensor::Tensor(int r,int c,int d,int a[]) {
+    this->r = r;
+    this->c = c;
+    this->d = d;
+    int i_max{r * c * d};
+    data = new float[i_max];
+    int ii{};
+    for (int i = 0; i < i_max; i++) {
+        if(c==9) c=0;
+        data[i] = a[ii++];
+        c++;
+    }
+}
 
 /**
  * Class distructor
