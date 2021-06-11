@@ -90,6 +90,7 @@ DAISGram DAISGram::grayscale() {
                 res.data(i, j, 0) = res.data(i, j, 1) = res.data(i, j, 2) = sum;
         }
     }
+    /*
     res.save_image("test/prova4.bmp");
     DAISGram prova;
     prova.load_image("test/prova4.bmp");
@@ -97,7 +98,7 @@ DAISGram DAISGram::grayscale() {
     DAISGram nuovo;
     nuovo.load_image("results/dais_gray.bmp");
     cout<<"gray"<<(nuovo.data==prova.data)<<"\n";
-
+    */
     return res;
 }
 
@@ -105,11 +106,11 @@ DAISGram DAISGram::brighten(float bright) {
     DAISGram res;
     res.data = (this->data) + bright;
     res.data.clamp(0, 255);
-
+    /*
     DAISGram nuovo;
     nuovo.load_image("results/dais_brighten_20.bmp");
     cout<<"bright"<<(nuovo.data==res.data)<<"\n";
-
+    */
     return res;
 }
 
@@ -136,11 +137,11 @@ DAISGram DAISGram::warhol() {
     original = original.concat(rg, 1);
     bg = bg.concat(rb, 1);
     res.data = original.concat(bg, 0);
-
+    /*
     DAISGram nuovo;
     nuovo.load_image("results/dais_warhol.bmp");
     cout<<"warhol"<<(nuovo.data==res.data)<<"\n";
-
+    */
     return res;
 }
 
@@ -149,7 +150,7 @@ DAISGram DAISGram::blend(const DAISGram &rhs, float alpha) {
     Tensor supp;
     DAISGram res;
     res.data = (data * alpha) + (rhs.data * (1 - alpha));
-
+    /*
     res.save_image("test/prova1.bmp");
     DAISGram prova;
     prova.load_image("test/prova1.bmp");
@@ -157,7 +158,7 @@ DAISGram DAISGram::blend(const DAISGram &rhs, float alpha) {
     DAISGram nuovo;
     nuovo.load_image("results/blend/blend_0.75.bmp");
     cout<<"blend"<<(prova.data==nuovo.data)<<"\n";
-
+    */
     return res;
 }
 
@@ -167,11 +168,11 @@ DAISGram DAISGram::sharpen() {
     Tensor f(3,3,3,arr);
     res.data = this->data.convolve(f);
     res.data.clamp(0, 255);
-
+    /*
     DAISGram nuovo;
     nuovo.load_image("results/dais_sharp.bmp");
     cout<<"sharp"<<(nuovo.data==res.data)<<"\n";
-
+    */
     return res;
 }
 
@@ -224,7 +225,7 @@ DAISGram DAISGram::edge() {
     *this=this->grayscale();
     res.data=this->data.convolve(f);
     res.data.clamp(0,255);
-
+    /*
     res.save_image("test/prova2.bmp");
     DAISGram prova;
     prova.load_image("test/prova2.bmp");
@@ -232,7 +233,7 @@ DAISGram DAISGram::edge() {
     DAISGram nuovo;
     nuovo.load_image("results/dais_edge.bmp");
     cout<<"edge"<<(nuovo.data==prova.data)<<"\n";
-
+    */
     return res;
 }
 
@@ -253,20 +254,22 @@ DAISGram DAISGram::edge() {
          * @return returns a new DAISGram containing the modified object
          */
 DAISGram DAISGram::smooth(int h) {
-    DAISGram res;
-    float c = (1.0 / (h * h));
-    Tensor f(h,h,h,c);
-    res.data = data.convolve(f);
+    if(h%2!=0) {
+        DAISGram res;
+        float c = (1.0 / (h * h));
+        Tensor f(h, h, h, c);
+        res.data = data.convolve(f);
+        /*
+        res.save_image("test/prova3.bmp");
+        DAISGram prova;
+        prova.load_image("test/prova3.bmp");
 
-    res.save_image("test/prova3.bmp");
-    DAISGram prova;
-    prova.load_image("test/prova3.bmp");
-
-    DAISGram nuovo;
-    nuovo.load_image("results/dais_smooth_3.bmp");
-    cout<<"smooth"<<(nuovo.data==prova.data)<<"\n";
-
-    return res;
+        DAISGram nuovo;
+        nuovo.load_image("results/dais_smooth_3.bmp");
+        cout << "smooth" << (nuovo.data == prova.data) << "\n";
+        */
+        return res;
+    }else throw (filter_odd_dimensions());
 }
 
 
@@ -323,9 +326,7 @@ DAISGram DAISGram::equalize() { // DA TERMINARE !!
             c++;
         }
         c = 0;
-        while (cdf[c] == 0) {
-            c++;
-        }
+        while (cdf[c] == 0) c++;
         int cdf_min = cdf[c];
         int den = (res.getRows() * res.getCols()) -(cdf_min);
         for (int i = 0; i < len; i++) { //normalizzato cdf

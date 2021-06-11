@@ -23,17 +23,17 @@ void show_help() {
 int main(int argc, char *argv[]) {
 
     DAISGram bright;
-    bright.load_image("images/dais.bmp");
+    bright.load_image("images/C1319.bmp");
     bright=bright.brighten(20);
     bright.save_image("test/bright.bmp");
 
     DAISGram gray;
-    gray.load_image("images/dais.bmp");
+    gray.load_image("images/C1319.bmp");
     gray=gray.grayscale();
     gray.save_image("test/gray.bmp");
 
     DAISGram war;
-    war.load_image("images/dais.bmp");
+    war.load_image("images/C1319.bmp");
     war = war.warhol();
     war.save_image("test/warhol.bmp");
 
@@ -44,24 +44,23 @@ int main(int argc, char *argv[]) {
     blend=blend.blend(blend2,0.75);
     blend.save_image("test/blend.bmp");
 
-
     DAISGram sharp;
-    sharp.load_image("images/dais.bmp");
+    sharp.load_image("images/C1319.bmp");
     sharp = sharp.sharpen();
     sharp.save_image("test/sharp.bmp");
 
     DAISGram edge;
-    edge.load_image("images/dais.bmp");
+    edge.load_image("images/C1319.bmp");
     edge = edge.edge();
     edge.save_image("test/edge.bmp");
 
     DAISGram emboss;
-    emboss.load_image("images/blend/blend_a.bmp");
+    emboss.load_image("images/blend/C1319.bmp");
     emboss = emboss.emboss();
     emboss.save_image("test/fiore_emboss.bmp");
 
     DAISGram smooth;
-    smooth.load_image("images/dais.bmp");
+    smooth.load_image("images/C1319.bmp");
     smooth = smooth.smooth(3);
     smooth.save_image("test/smooth.bmp");
 

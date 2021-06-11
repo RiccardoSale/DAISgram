@@ -407,17 +407,7 @@ public:
      * ...
      * [..., ..., k]
      */
-    friend ostream& operator<< (ostream& stream, const Tensor & obj) {
-        int i_max = obj.r * obj.c * obj.d;
-        for (int i = 0; i < i_max; i++) {
-            if (i % (obj.c * obj.r) == 0 && i != 0)
-                stream << "\n" << "dim" << "\n";
-            else if (i % obj.c == 0 && i != 0)
-                stream << "\n";
-            stream << obj.data[i] << "||";
-        };
-        return stream;
-    }
+    friend ostream& operator<< (ostream& stream, const Tensor & obj);
 
     /**
      * Reading from file
