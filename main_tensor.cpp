@@ -22,9 +22,6 @@ int main() {
     cout<<rescale<<"\n"<<"\n";
     cout<<"inizio"<<"\n";
     Tensor s1(1,1,1,10);
-    Tensor t;
-    //t=t+5;
-    cout<<t;
     cout<<"fine"<<"\n";
     Tensor p(3, 3, 3);
     p.init_random(60,5);
@@ -37,6 +34,7 @@ int main() {
     cout<<"\n"<<"clamp"<<"\n";
     somma.clamp(10,130);
     cout<<somma;
+    cout<<"inizio"<<"\n";
     cout<<"\n"<<"padding"<<"\n";
     Tensor pad =somma.padding(3,2);
     cout<<pad;

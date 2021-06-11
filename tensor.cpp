@@ -13,36 +13,19 @@
 
 using namespace std;
 
-/**
-* Class constructor
-*
-* Parameter-less class constructor
-*/
 Tensor::Tensor() {
     data = nullptr;
     this->r = this->c = this->d = 0;
 }
 
-/**
-* Class constructor
-*
-* Creates a new tensor of size r*c*d initialized at value v
-*
-* @param r
-* @param c
-* @param d
-* @param v
-* @return new Tensor
-*/
 Tensor::Tensor(int r, int c, int d, float v) {
     this->r = r;
     this->c = c;
     this->d = d;
     int i_max{r * c * d};
     data = new float[i_max];
-    for (int i = 0; i < i_max; i++) {
+    for (int i = 0; i < i_max; i++)
         data[i] = v;
-    }
 }
 /**
  * Creates a tensor of size r*c*d from an array that represents each of the d dimension
@@ -66,76 +49,56 @@ Tensor::Tensor(int r,int c,int d,int a[]) {
     }
 }
 
-/**
- * Class distructor
- *
- * Cleanup the data when deallocated
- */
 Tensor::~Tensor() {
     delete[] data;
 }
 
-/**
- * Operator oveloding ()
- *
- * if indexes are out of bound throw index_out_of_bound() exception
- *
- * @return the value at location [i][j][k]
- */
 float Tensor::operator()(int i, int j, int k) const {
     if(data) {
-        if (i+1 > r || j+1 > c || k+1 > d || i<0 || j<0 || k<0) {
-            throw (index_out_of_bound());
-        } else {
-            return data[k * r * c + (i * c + j)]; //k*r*c = salto tot dimensioni / i*c =salto tot "righe" +j= aggiungo colonne
-        }
+        if (i >= r || j >= c || k >= d || i<0 || j<0 || k<0) throw (index_out_of_bound());
+        return data[k * r * c + (i * c + j)]; //k*r*c = salto tot dimensioni / i*c =salto tot "righe" +j= aggiungo colonne
     }else throw (tensor_not_initialized());
 }
 
+float &Tensor::operator()(int i, int j, int k) {
+    if(data) {
+        if (i >= r || j >= c || k >= d || i<0 || j<0 || k<0) throw (index_out_of_bound());
+        float &res = data[k * r * c + (i * c + j)];
+        return res;
+    }else throw (tensor_not_initialized());
+}
+
+
 /**
- * Operator overloading ()
- *
- * Return the pointer to the location [i][j][k] such that the operator (i,j,k) can be used to
- * modify tensor data.
+ * Operator at -> corrisponde all'operatore [] degli array / vettori + efficente ma meno controlli
  *
  * If indexes are out of bound throw index_out_of_bound() exception
  *
- * @return the pointer to the location [i][j][k]
+ * @return the pointer to the location [i]
  */
-float &Tensor::operator()(int i, int j, int k) {
+float &Tensor::at(int i) {
     if(data) {
-        if (i+1 > r || j+1 > c || k+1 > d || i<0 || j<0 || k<0) {
-            throw (index_out_of_bound());
-        } else {
-            float &res = data[k * r * c + (i * c + j)];
-            return res;
-        }
-    }else throw (tensor_not_initialized());
-}
-
-float &Tensor::at(int i) { //at non controlla se index e fuori dal massimo
-    if(data) {
-        if(i<0) throw index_out_of_bound();
         float &res = data[i];
         return res;
     }else throw (tensor_not_initialized());
 }
 
-float Tensor::at(int i)const { //operatore at per controllare valore
+/**
+ * Operator at -> corrisponde all'operatore [] degli array / vettori + efficente ma meno controlli
+ *
+ * If indexes are out of bound throw index_out_of_bound() exception
+ *
+ * Return the pointer to the location [i] such that the operator at(i) can be used to modify tensor data.
+ *
+ * @return the pointer to the location [i]
+ */
+
+float Tensor::at(int i)const {
     if(data) {
-        if(i<0) throw index_out_of_bound();
         return data[i];
     }else throw (tensor_not_initialized());
 }
 
-
-/**
- * Copy constructor
- *
- * This constructor copy the data from another Tensor
- *
- * @return the new Tensor
- */
 Tensor::Tensor(const Tensor &that) {
     if (that.data){
         r = that.r;
@@ -143,9 +106,8 @@ Tensor::Tensor(const Tensor &that) {
         d = that.d;
         int i_max{r * c * d};
         data = new float[i_max];
-        for (int i = 0; i < i_max; i++) {
+        for (int i = 0; i < i_max; i++)
             data[i] = that.data[i];
-        }
     }else throw (tensor_not_initialized());
 }
 
@@ -162,17 +124,7 @@ bool Tensor::operator==(const Tensor& rhs) const {
         }
     }else throw (tensor_not_initialized());
 }
-/**
- * Operator overloading -
- *
- * It performs the point-wise difference between two Tensors.
- *
- * result(i,j,k)=this(i,j,k)-rhs(i,j,k)
- *
- * The two tensors must have the same size otherwise throw a dimension_mismatch()
- *
- * @return returns a new Tensor containing the result of the operation
- */
+
 Tensor Tensor::operator-(const Tensor &rhs) const {
     if(rhs.data && data){
         if (r == rhs.r && c == rhs.c && d == rhs.d) {
@@ -188,17 +140,6 @@ Tensor Tensor::operator-(const Tensor &rhs) const {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Operator overloading +
- *
- * It performs the point-wise sum between two Tensors.
- *
- * result(i,j,k)=this(i,j,k)+rhs(i,j,k)
- *
- * The two tensors must have the same size otherwise throw a dimension_mismatch()
- *
- * @return returns a new Tensor containing the result of the operation
-*/
 Tensor Tensor::operator+(const Tensor &rhs) const {
     if(rhs.data && data){
         if (r == rhs.r && c == rhs.c && d == rhs.d) {
@@ -214,17 +155,6 @@ Tensor Tensor::operator+(const Tensor &rhs) const {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Operator overloading *
- *
- * It performs the point-wise product between two Tensors.
- *
- * result(i,j,k)=this(i,j,k)*rhs(i,j,k)
- *
- * The two tensors must have the same size otherwise throw a dimension_mismatch()
- *
- * @return returns a new Tensor containing the result of the operation
- */
 Tensor Tensor::operator*(const Tensor &rhs) const {
     if(rhs.data && data){
         if (r == rhs.r && c == rhs.c && d == rhs.d) {
@@ -240,17 +170,6 @@ Tensor Tensor::operator*(const Tensor &rhs) const {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Operator overloading /
- *
- * It performs the point-wise division between two Tensors.
- *
- * result(i,j,k)=this(i,j,k)/rhs(i,j,k)
- *
- * The two tensors must have the same size otherwise throw a dimension_mismatch()
- *
- * @return returns a new Tensor containing the result of the operation
- */
 Tensor Tensor::operator/(const Tensor &rhs) const {
     if(rhs.data && data){
         if (r == rhs.r && c == rhs.c && d == rhs.d) {
@@ -267,15 +186,6 @@ Tensor Tensor::operator/(const Tensor &rhs) const {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Operator overloading -
- *
- * It performs the point-wise difference between a Tensor and a constant
- *
- * result(i,j,k)=this(i,j,k)-rhs
- *
- * @return returns a new Tensor containing the result of the operation
- */
 Tensor Tensor::operator-(const float &rhs) const {
     if(data){
         Tensor result(r, c, d);
@@ -287,15 +197,6 @@ Tensor Tensor::operator-(const float &rhs) const {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Operator overloading +
- *
- * It performs the point-wise sum between a Tensor and a constant
- *
- * result(i,j,k)=this(i,j,k)+rhs
- *
- * @return returns a new Tensor containing the result of the operation
- */
 Tensor Tensor::operator+(const float &rhs) const {
     if(data){
         Tensor result(r, c, d);
@@ -307,15 +208,6 @@ Tensor Tensor::operator+(const float &rhs) const {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Operator overloading *
- *
- * It performs the point-wise product between a Tensor and a constant
- *
- * result(i,j,k)=this(i,j,k)*rhs
- *
- * @return returns a new Tensor containing the result of the operation
- */
 Tensor Tensor::operator*(const float &rhs) const {
     if(data){
         Tensor result(r, c, d);
@@ -327,15 +219,6 @@ Tensor Tensor::operator*(const float &rhs) const {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Operator overloading / between a Tensor and a constant
- *
- * It performs the point-wise division between a Tensor and a constant
- *
- * result(i,j,k)=this(i,j,k)/rhs
- *
- * @return returns a new Tensor containing the result of the operation
- */
 Tensor Tensor::operator/(const float &rhs) const {
     if(data){
         if(rhs==0) throw (unknown_exception());
@@ -348,42 +231,21 @@ Tensor Tensor::operator/(const float &rhs) const {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Operator overloading = (assignment)
- *
- * Perform the assignment between this object and another
- *
- * @return a reference to the receiver object
- */
-
 Tensor &Tensor::operator=(const Tensor &other) {
+        int i_max = other.r * other.c * other.d;
         if(other.d!=d || other.r!=r || other.c!=c) {
             d = other.d;
             r = other.r;
             c = other.c;
-            int i_max = r * c * d;
             if (data)
                 delete[] data;
             data = new float[i_max];
-            for (int i = 0; i < i_max; i++)
-                data[i] = other.data[i];
-        }else{
-            int i_max = r * c * d;
-            for (int i = 0; i < i_max; i++)
-                data[i] = other.data[i];
         }
+        for (int i = 0; i < i_max; i++)
+            data[i] = other.data[i];
         return *this;
 }
 
-
-/**
- * Random Initialization
- * 
- * Perform a random initialization of the tensor
- * 
- * @param mean The mean
- * @param std  Standard deviation
- */
 void Tensor::init_random(float mean, float std) {
     if(data) {
         std::default_random_engine generator;
@@ -399,16 +261,6 @@ void Tensor::init_random(float mean, float std) {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Constant Initialization
- *
- * Perform the initialization of the tensor to a value v
- *
- * @param r The number of rows
- * @param c The number of columns
- * @param d The depth
- * @param v The initialization value
- */
 void Tensor::init(int r, int c, int d, float v) {
     if(r<0 || c<0 || d<0) throw (index_out_of_bound());
     this->r = r;
@@ -418,19 +270,10 @@ void Tensor::init(int r, int c, int d, float v) {
     if (data)
         delete[] data;
     data = new float[i_max];
-    for (int i = 0; i < i_max; i++) {
+    for (int i = 0; i < i_max; i++)
         data[i] = v;
-    }
 }
 
-/**
- * Tensor Clamp
- *
- * Clamp the tensor such that the lower value becomes low and the higher one become high.
- *
- * @param low Lower value
- * @param high Higher value
- */
 void Tensor::clamp(float low, float high) {
     if(data) {
         int i_max = r * c * d;
@@ -444,19 +287,6 @@ void Tensor::clamp(float low, float high) {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Tensor Rescaling
- *
- * Rescale the value of the tensor following this rule:
- *
- * newvalue(i,j,k) = ((data(i,j,k)-min(k))/(max(k)-min(k)))*new_max
- *
- * where max(k) and min(k) are the maximum and minimum value in the k-th channel.
- *
- * new_max is the new value for the maximum
- *
- * @param new_max New maximum vale
- */
 void Tensor::rescale(float new_max) {
     //trovo max value dim 1
     if(data) {
@@ -464,7 +294,7 @@ void Tensor::rescale(float new_max) {
         float min{data[0]};
         float val;
         for (int z = 0; z < d; z++) { //ciclo dimensioni
-            for (int y = 0; y < r; y++) { //
+            for (int y = 0; y < r; y++) {
                 int i = z * r * c + (y * c);
                 for (int x = 0; x < r; x++) {
                     val = data[i + x];
@@ -490,17 +320,6 @@ void Tensor::rescale(float new_max) {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Tensor padding
- *
- * Zero pad a tensor in height and width, the new tensor will have the following dimensions:
- *
- * (rows+2*pad_h) x (cols+2*pad_w) x (depth)
- *
- * @param pad_h the height padding
- * @param pad_w the width padding
- * @return the padded tensor
- */
 Tensor Tensor::padding(int pad_h, int pad_w) const {
     if(data) {
         if(pad_h <0 || pad_w<0) throw (unknown_exception());
@@ -525,24 +344,6 @@ Tensor Tensor::padding(int pad_h, int pad_w) const {
     }else throw (tensor_not_initialized());
 }
 
-/**
- * Subset a tensor
- *
- * retuns a part of the tensor having the following indices:
- * row_start <= i < row_end
- * col_start <= j < col_end
- * depth_start <= k < depth_end
- *
- * The right extrema is NOT included
- *
- * @param row_start
- * @param row_end
- * @param col_start
- * @param col_end
- * @param depth_start
- * @param depth_end
- * @return the subset of the original tensor
- */
 Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end,unsigned int depth_start, unsigned int depth_end) const {
     if(data) {
         if(row_start <0 || row_end <0 || col_start<0 || col_end<0 || depth_start <0 || depth_end<0 || row_start>row_end || col_start>col_end || depth_start>depth_end) throw index_out_of_bound();
@@ -559,35 +360,16 @@ Tensor Tensor::subset(unsigned int row_start, unsigned int row_end, unsigned int
     }else throw (tensor_not_initialized());
 }
 
-/** 
-     * Concatenate 
-     * 
-     * The function concatenates two tensors along a give axis
-     * 
-     * Example: this is of size 10x5x6 and rhs is of 25x5x6
-     * 
-     * if concat on axis 0 (row) the result will be a new Tensor of size 35x5x6
-     * 
-     * if concat on axis 1 (columns) the operation will fail because the number 
-     * of rows are different (10 and 25).
-     * 
-     * In order to perform the concatenation is mandatory that all the dimensions 
-     * different from the axis should be equal, other wise throw concat_wrong_dimension(). 
-     *  
-     * @param rhs The tensor to concatenate with
-     * @param axis The axis along which perform the concatenation 
-     * @return a new Tensor containing the result of the concatenation
-     */
 Tensor Tensor::concat(const Tensor &rhs, int axis) const {
     if(rhs.data && data){
         Tensor res;
         if(axis <0 || axis >1) throw unknown_exception();
+        int my_pos = 0;
+        int rhs_pos = 0;
+        int res_pos = 0;
         if (axis == 0) { //l'asse è sulle righe
             if (c == rhs.c && d == rhs.d) {
                 res.init(r+rhs.r,c,d);
-                int my_pos = 0; //indici vari
-                int rhs_pos = 0;
-                int res_pos = 0;
 
                 int my_dimension = r * c;
                 int rhs_dimension = rhs.r * rhs.c;
@@ -606,9 +388,6 @@ Tensor Tensor::concat(const Tensor &rhs, int axis) const {
         } else if (axis == 1) { //asse colonne
             if (r == rhs.r && d == rhs.d) {
                 res.init(r,c+rhs.c,d);
-                int my_pos = 0;
-                int rhs_pos = 0;
-                int res_pos = 0;
 
                 for (int i = 0; i < d; i++) { //lo faccio per tot dim
                     for (int nr = 0; nr < r; nr++) {
@@ -629,19 +408,6 @@ Tensor Tensor::concat(const Tensor &rhs, int axis) const {
         throw (tensor_not_initialized());
     }
 }
-
-/**
- * Convolution
- *
- * This function performs the convolution of the Tensor with a filter.
- *
- * The filter f must have odd dimensions and same depth.
- *
- * Remeber to apply the padding before running the convolution
- *
- * @param f The filter
- * @return a new Tensor containing the result of the convolution
- */
 
 Tensor Tensor::convolve(const Tensor &f) const {
     if(data && f.data) {
@@ -680,43 +446,21 @@ Tensor Tensor::convolve(const Tensor &f) const {
 
 /* UTILITY */
 
-/**
- * Rows
- *
- * @return the number of rows in the tensor
- */
 int Tensor::rows() const {
     return r;
 }
 
-/**
- * Cols
- *
- * @return the number of columns in the tensor
- */
 int Tensor::cols() const {
     return c;
 }
 
-/**
- * Depth
- *
- * @return the depth of the tensor
- */
 int Tensor::depth() const {
     return d;
 }
 
-/**
- * Get minimum
- *
- * Compute the minimum value considering a particular index in the third dimension
- *
- * @return the minimum of data( , , k)
- */
 float Tensor::getMin(int k) const {
     if(data) {
-        if(k<0 || k+1>d) throw index_out_of_bound();
+        if(k<0 || k>=d) throw index_out_of_bound();
         float min = data[0];
         int stop = k * r * c + r * c;
         for (int i = k * r * c; i < stop; i++)
@@ -725,16 +469,9 @@ float Tensor::getMin(int k) const {
     }else throw tensor_not_initialized();
 }
 
-/**
- * Get maximum
- *
- * Compute the maximum value considering a particular index in the third dimension
- *
- * @return the maximum of data( , , k)
- */
 float Tensor::getMax(int k) const {
     if(data) {
-        if(k<0 || k+1>d) throw index_out_of_bound();
+        if(k<0 || k>=d) throw index_out_of_bound();
         float max = data[0];
         int stop = k * r * c + r * c;
         for (int i = k * r * c; i < stop; i++)
@@ -743,30 +480,22 @@ float Tensor::getMax(int k) const {
     }else throw tensor_not_initialized();
 }
 
-/**
- * showSize
- *
- * shows the dimensions of the tensor on the standard output.
- *
- * The format is the following:
- * rows" x "colums" x "depth
- *
- */
 void Tensor::showSize() const {
     cout << r << " x " << c << " x " << d;
 }
 
-
 ostream& operator<<(ostream& stream, const Tensor & obj){
-    int i_max = obj.r * obj.c * obj.d;
-    for (int i = 0; i < i_max; i++) {
-        if (i % (obj.c * obj.r) == 0 && i != 0)
-            stream << "\n" << "dim" << "\n";
-        else if (i % obj.c == 0 && i != 0)
-            stream << "\n";
-        stream << obj.data[i] << "||";
-    }
-    return stream;
+    if(obj.data) {
+        int i_max = obj.r * obj.c * obj.d;
+        for (int i = 0; i < i_max; i++) {
+            if (i % (obj.c * obj.r) == 0 && i != 0)
+                stream << "\n" << "dim" << "\n";
+            else if (i % obj.c == 0 && i != 0)
+                stream << "\n";
+            stream << obj.data[i] << "||";
+        }
+        return stream;
+    }else throw tensor_not_initialized();
 }
 
 void Tensor::read_file(string filename) {

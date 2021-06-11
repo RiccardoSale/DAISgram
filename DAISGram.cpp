@@ -30,9 +30,7 @@ void DAISGram::load_image(string filename) {
             data(i, j, 2) = (float) img.blue_at(j, i);
         }
     }
-
 }
-
 
 /**
  * Save a DAISGram object to a bitmap file.
@@ -73,13 +71,6 @@ int DAISGram::getDepth() {
     return data.depth();
 }
 
-/**
-         * Create a grayscale version of the object
-         *
-         * A grayscale image is produced by substituting each pixel with its average on all the channel
-         *
-         * @return returns a new DAISGram containing the modified object
-         */
 DAISGram DAISGram::grayscale() {
     float sum;
     DAISGram res;
@@ -90,15 +81,6 @@ DAISGram DAISGram::grayscale() {
                 res.data(i, j, 0) = res.data(i, j, 1) = res.data(i, j, 2) = sum;
         }
     }
-    /*
-    res.save_image("test/prova4.bmp");
-    DAISGram prova;
-    prova.load_image("test/prova4.bmp");
-
-    DAISGram nuovo;
-    nuovo.load_image("results/dais_gray.bmp");
-    cout<<"gray"<<(nuovo.data==prova.data)<<"\n";
-    */
     return res;
 }
 
@@ -106,11 +88,6 @@ DAISGram DAISGram::brighten(float bright) {
     DAISGram res;
     res.data = (this->data) + bright;
     res.data.clamp(0, 255);
-    /*
-    DAISGram nuovo;
-    nuovo.load_image("results/dais_brighten_20.bmp");
-    cout<<"bright"<<(nuovo.data==res.data)<<"\n";
-    */
     return res;
 }
 
@@ -137,11 +114,6 @@ DAISGram DAISGram::warhol() {
     original = original.concat(rg, 1);
     bg = bg.concat(rb, 1);
     res.data = original.concat(bg, 0);
-    /*
-    DAISGram nuovo;
-    nuovo.load_image("results/dais_warhol.bmp");
-    cout<<"warhol"<<(nuovo.data==res.data)<<"\n";
-    */
     return res;
 }
 
@@ -150,15 +122,6 @@ DAISGram DAISGram::blend(const DAISGram &rhs, float alpha) {
     Tensor supp;
     DAISGram res;
     res.data = (data * alpha) + (rhs.data * (1 - alpha));
-    /*
-    res.save_image("test/prova1.bmp");
-    DAISGram prova;
-    prova.load_image("test/prova1.bmp");
-
-    DAISGram nuovo;
-    nuovo.load_image("results/blend/blend_0.75.bmp");
-    cout<<"blend"<<(prova.data==nuovo.data)<<"\n";
-    */
     return res;
 }
 
@@ -168,29 +131,9 @@ DAISGram DAISGram::sharpen() {
     Tensor f(3,3,3,arr);
     res.data = this->data.convolve(f);
     res.data.clamp(0, 255);
-    /*
-    DAISGram nuovo;
-    nuovo.load_image("results/dais_sharp.bmp");
-    cout<<"sharp"<<(nuovo.data==res.data)<<"\n";
-    */
     return res;
 }
 
-/**
-         * Emboss the image
-         * 
-         * This function makes the image embossed (a light 3D effect) by convolving it with an
-         * embossing filter
-         * 
-         * filter[3][3]
-         *    -2 -1  0
-         *    -1  1  1
-         *     0  1  2
-         * 
-         * Before returning the image, the corresponding tensor should be clamped in [0,255]
-         *  
-         * @return returns a new DAISGram containing the modified object
-         */
 DAISGram DAISGram::emboss() {
     DAISGram res;
     int arr[9]={-2,-1,0,-1,1,1,0,1,2};
@@ -200,24 +143,6 @@ DAISGram DAISGram::emboss() {
     return res;
 }
 
-/**
-         * Edges of an image
-         * 
-         * This function extract the edges of an image by using the convolution 
-         * operator and the following filter
-         * 
-         * 
-         * filter[3][3]
-         * -1  -1  -1
-         * -1   8  -1
-         * -1  -1  -1
-         * 
-         * Remeber to convert the image to grayscale before running the convolution.
-         * 
-         * Before returning the image, the corresponding tensor should be clamped in [0,255]
-         *  
-         * @return returns a new DAISGram containing the modified object
-         */
 DAISGram DAISGram::edge() {
     DAISGram res;
     int arr[9]={-1,-1,-1,-1,8,-1,-1,-1,-1};
@@ -225,53 +150,18 @@ DAISGram DAISGram::edge() {
     *this=this->grayscale();
     res.data=this->data.convolve(f);
     res.data.clamp(0,255);
-    /*
-    res.save_image("test/prova2.bmp");
-    DAISGram prova;
-    prova.load_image("test/prova2.bmp");
-
-    DAISGram nuovo;
-    nuovo.load_image("results/dais_edge.bmp");
-    cout<<"edge"<<(nuovo.data==prova.data)<<"\n";
-    */
     return res;
 }
 
-/**
-         * Smooth the image
-         * 
-         * This function remove the noise in an image using convolution and an average filter
-         * of size h*h:
-         * 
-         * c = 1/(h*h)
-         * 
-         * filter[3][3]
-         *    c c c
-         *    c c c
-         *    c c c
-         *  
-         * @param h the size of the filter
-         * @return returns a new DAISGram containing the modified object
-         */
 DAISGram DAISGram::smooth(int h) {
     if(h%2!=0) {
         DAISGram res;
         float c = (1.0 / (h * h));
         Tensor f(h, h, h, c);
         res.data = data.convolve(f);
-        /*
-        res.save_image("test/prova3.bmp");
-        DAISGram prova;
-        prova.load_image("test/prova3.bmp");
-
-        DAISGram nuovo;
-        nuovo.load_image("results/dais_smooth_3.bmp");
-        cout << "smooth" << (nuovo.data == prova.data) << "\n";
-        */
         return res;
     }else throw (filter_odd_dimensions());
 }
-
 
 DAISGram DAISGram::greenscreen(DAISGram & bkg, int rgb[], float threshold[]){
     DAISGram res;
@@ -293,14 +183,10 @@ DAISGram DAISGram::greenscreen(DAISGram & bkg, int rgb[], float threshold[]){
                     res.data.at(i+val2)=bkg.data.at(i+val2);
                 }
     }
-    DAISGram nuovo;
-    nuovo.load_image("results/greenscreen/seba_flower.bmp");
-    cout<<"greenscale"<<(nuovo.data==res.data)<<"\n";
-
     return res;
 }
 
-DAISGram DAISGram::equalize() { // DA TERMINARE !!
+DAISGram DAISGram::equalize() {
     DAISGram res;
     res.data.init(data.rows(),data.cols(),data.depth());
     int len = 256;
@@ -337,23 +223,9 @@ DAISGram DAISGram::equalize() { // DA TERMINARE !!
         }
     }
 
-    DAISGram nuovo;
-    nuovo.load_image("results/dais_equalize.bmp");
-    cout<<(nuovo.data==res.data)<<"equalize"<<"\n";
-
     return res;
 }
 
-/**
- * Generate Random Image
- *
- * Generate a random image from nois
- *
- * @param h height of the image
- * @param w width of the image
- * @param d number of channels
- * @return returns a new DAISGram containing the generated image.
- */
 void DAISGram::generate_random(int h, int w, int d) {
     data = Tensor(h, w, d, 0.0);
     data.init_random(128, 50);
