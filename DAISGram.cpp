@@ -8,12 +8,6 @@
 
 using namespace std;
 
-/**
- * Load a bitmap from file
- *
- * @param filename String containing the path of the file
- */
-
 void DAISGram::load_image(string filename) {
     BmpImg img = BmpImg();
 
@@ -31,14 +25,6 @@ void DAISGram::load_image(string filename) {
         }
     }
 }
-
-/**
- * Save a DAISGram object to a bitmap file.
- *
- * Data is clamped to 0,255 before saving it.
- *
- * @param filename String containing the path where to store the image.
- */
 
 void DAISGram::save_image(string filename) {
 
@@ -119,7 +105,6 @@ DAISGram DAISGram::warhol() {
 
 
 DAISGram DAISGram::blend(const DAISGram &rhs, float alpha) {
-    Tensor supp;
     DAISGram res;
     res.data = (data * alpha) + (rhs.data * (1 - alpha));
     return res;
@@ -190,14 +175,12 @@ DAISGram DAISGram::equalize() {
     DAISGram res;
     res.data.init(data.rows(),data.cols(),data.depth());
     int len = 256;
-    int c;
-    int add;
-    for (int depth{}; depth < data.depth(); depth++) {
+    for (int depth = 0; depth < data.depth(); depth++) {
         float cdf[256]={};
-        float sc = {};
+        float sc = {};  // somma accumulata
         float save;
-        add = data.rows()*data.cols() * depth;
-        c=0;
+        int add = data.rows()*data.cols() * depth;
+        int c=0;
         while (c < data.rows()*data.cols()) { //occorrenze fatte //ciclo su matrice
             cdf[(int)data.at(c + add)]++;
             c++;
@@ -215,14 +198,13 @@ DAISGram DAISGram::equalize() {
         while (cdf[c] == 0) c++;
         int cdf_min = cdf[c];
         int den = (res.getRows() * res.getCols()) -(cdf_min);
-        for (int i = 0; i < len; i++) { //normalizzato cdf
+        for (int i = 0; i < len; i++) { //applichiamo formula normalizzazione
             cdf[i] = (int)((((cdf[i] - cdf_min) / (den) ) * (len - 1)));
         }
-        for (int i = 0; i < res.data.rows()*res.data.cols(); i++) {
+        for (int i = 0; i < res.data.rows()*res.data.cols(); i++) { //carico i risultati nel Daisgram res
             res.data.at(i+add) = cdf[(int)data.at(i+add)];
         }
     }
-
     return res;
 }
 

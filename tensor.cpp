@@ -27,14 +27,7 @@ Tensor::Tensor(int r, int c, int d, float v) {
     for (int i = 0; i < i_max; i++)
         data[i] = v;
 }
-/**
- * Creates a tensor of size r*c*d from an array that represents each of the d dimension
- * The array must have the correct size of r*c
- * @param r
- * @param c
- * @param d
- * @param a
- */
+
 Tensor::Tensor(int r,int c,int d,int a[]) {
     this->r = r;
     this->c = c;
@@ -68,30 +61,12 @@ float &Tensor::operator()(int i, int j, int k) {
     }else throw (tensor_not_initialized());
 }
 
-
-/**
- * Operator at -> corrisponde all'operatore [] degli array / vettori + efficente ma meno controlli
- *
- * If indexes are out of bound throw index_out_of_bound() exception
- *
- * @return the pointer to the location [i]
- */
 float &Tensor::at(int i) {
     if(data) {
         float &res = data[i];
         return res;
     }else throw (tensor_not_initialized());
 }
-
-/**
- * Operator at -> corrisponde all'operatore [] degli array / vettori + efficente ma meno controlli
- *
- * If indexes are out of bound throw index_out_of_bound() exception
- *
- * Return the pointer to the location [i] such that the operator at(i) can be used to modify tensor data.
- *
- * @return the pointer to the location [i]
- */
 
 float Tensor::at(int i)const {
     if(data) {
@@ -290,6 +265,7 @@ void Tensor::clamp(float low, float high) {
 void Tensor::rescale(float new_max) {
     //trovo max value dim 1
     if(data) {
+        if(new_max>255 || new_max<0)throw unknown_exception();
         float max{data[0]};
         float min{data[0]};
         float val;

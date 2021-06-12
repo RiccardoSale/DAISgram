@@ -1,2 +1,4 @@
 # DAISgram
-progetto finale PL
+Progetto finale PL
+
+Sale Riccardo - Carola Pessotto - Beatrice Spagnolo

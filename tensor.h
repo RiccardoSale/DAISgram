@@ -46,8 +46,13 @@ public:
     Tensor(int r, int c, int d, float v = 0.0);
 
     /**
-     *
-     */
+    * Creates a tensor of size r*c*d from an array that represents each of the d dimension
+    * The array must have the correct size of r*c
+    * @param r
+    * @param c
+    * @param d
+    * @param a
+    */
     Tensor(int r,int c,int d,int a[]);
     /**
      * Class distructor
@@ -64,6 +69,14 @@ public:
      * @return the value at location [i][j][k]
      */
     float operator()(int i, int j, int k) const;
+
+    /**
+    * Operator at -> corrisponde all'operatore [] degli array / vettori + efficente ma meno controlli
+    *
+    * If indexes are out of bound throw index_out_of_bound() exception
+    *
+    * @return the pointer to the location [i]
+    */
     float at(int i)const;
 
     /**
@@ -78,6 +91,15 @@ public:
      */
     float &operator()(int i, int j, int k);
 
+    /**
+    * Operator at -> corrisponde all'operatore [] degli array / vettori + efficente ma meno controlli
+    *
+    * If indexes are out of bound throw index_out_of_bound() exception
+    *
+    * Return the pointer to the location [i] such that the operator at(i) can be used to modify tensor data.
+    *
+    * @return the pointer to the location [i]
+    */
     float &at(int i);
 
     /**

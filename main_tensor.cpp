@@ -34,7 +34,6 @@ int main() {
     cout<<"\n"<<"clamp"<<"\n";
     somma.clamp(10,130);
     cout<<somma;
-    cout<<"inizio"<<"\n";
     cout<<"\n"<<"padding"<<"\n";
     Tensor pad =somma.padding(3,2);
     cout<<pad;
