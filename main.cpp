@@ -22,7 +22,6 @@ void show_help(){
 }
 
 int main (int argc, char * argv[]) {
-
     char * fn_in_1;  /* file 1 */
     char * fn_in_2;  /* file 2 */
     char * operation; /* operazione da eseguire */

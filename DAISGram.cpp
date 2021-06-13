@@ -199,7 +199,7 @@ DAISGram DAISGram::equalize() {
         int cdf_min = cdf[c];
         int den = (res.getRows() * res.getCols()) -(cdf_min);
         for (int i = 0; i < len; i++) { //applichiamo formula normalizzazione
-            cdf[i] = (int)((((cdf[i] - cdf_min) / (den) ) * (len - 1)));
+            cdf[i] = round((((cdf[i] - cdf_min) / (den) ) * (len - 1)));
         }
         for (int i = 0; i < res.data.rows()*res.data.cols(); i++) { //carico i risultati nel Daisgram res
             res.data.at(i+add) = cdf[(int)data.at(i+add)];
