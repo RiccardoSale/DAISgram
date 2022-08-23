@@ -30,4 +30,4 @@ Close-Up Piano | Background | GreenScreen
  ## Histogram equalization
  Original Image | Equalization
 ------------ | -------------
-![DAIS](https://github.com/RiccardoSale/DAISgram/blob/main/images/fullmoon.bmp) | ![DAIS+20](https://github.com/RiccardoSale/DAISgram/blob/main/results/fullmoon_equalize.bmp)
+![DAIS](https://github.com/RiccardoSale/DAISgram/blob/main/images/equalize/fullmoon.bmp) | ![DAIS+20](https://github.com/RiccardoSale/DAISgram/blob/main/results/fullmoon_equalize.bmp)
