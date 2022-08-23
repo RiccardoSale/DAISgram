@@ -14,7 +14,7 @@ Image | Smooth (h=3) | Smooth (h=5) | Smooth (h=7)
 
 Image | Sharp | Edge | Warhol
 ------------ | ------------- | ------------- | -------------
-![DAIS](hhttps://github.com/RiccardoSale/DAISgram/blob/main/images/dais.bmp) | ![DAIS+20](https://github.com/RiccardoSale/DAISgram/blob/main/results/dais_sharp.bmp) | ![DAIS+100](https://github.com/RiccardoSale/DAISgram/blob/main/dais_edge.bmp) | ![DAIS+100](https://github.com/RiccardoSale/DAISgram/blob/main/results/dais_warhol.bmp) |
+![DAIS](https://github.com/RiccardoSale/DAISgram/blob/main/images/dais.bmp) | ![DAIS+20](https://github.com/RiccardoSale/DAISgram/blob/main/results/dais_sharp.bmp) | ![DAIS+100](https://github.com/RiccardoSale/DAISgram/blob/main/dais_edge.bmp) | ![DAIS+100](https://github.com/RiccardoSale/DAISgram/blob/main/results/dais_warhol.bmp) |
 
 Image A | Image B | Blend alpha=0 | alpha=0.25 | alpha=0.5 | alpha=0.75 | alpha=1.00
 ------------ | ------------- | ------------- | ------------- | ------------- | ------------- | -------------
