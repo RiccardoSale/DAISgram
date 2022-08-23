@@ -24,8 +24,6 @@ Image A | Image B | Blend alpha=0 | alpha=0.25 | alpha=0.5 | alpha=0.75 | alpha=
 Close-Up Piano | Background | GreenScreen
 ------------ | ------------- | -------------
 ![DAIS](https://github.com/RiccardoSale/DAISgram/blob/main/images/greenscreen/gs_2.bmp) | ![DAIS+20](https://github.com/RiccardoSale/DAISgram/blob/main/images/greenscreen/gs_2_bkg.bmp) | ![DAIS+100](https://github.com/RiccardoSale/DAISgram/blob/main/results/greenscreen/dais_matrix.bmp)
- | | | RGB={144, 208, 49}, threshold={100, 100, 50}
- |  |  |
 
  ## Histogram equalization
  Original Image | Equalization
